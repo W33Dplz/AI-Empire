@@ -1,0 +1,7 @@
+[
+  {
+    "step": "PATCH_FILE",
+    "file": "sandbox/test.txt",
+    "content": "Hello Safe Empire"
+  }
+]
