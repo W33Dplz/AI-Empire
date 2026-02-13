@@ -1,9 +1,0 @@
-{
-  "steps": [
-    {
-      "type": "PATCH_FILE",
-      "target": "test.txt",
-      "content": "micro test content"
-    }
-  ]
-}

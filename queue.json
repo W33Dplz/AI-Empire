@@ -1,0 +1,19 @@
+[
+  {
+    "status": "DONE",
+    "plan": {
+      "steps": [
+        {
+          "type": "PATCH_FILE",
+          "target": "config/app.js",
+          "content": "console.log(\"high risk change\");"
+        },
+        {
+          "type": "PATCH_FILE",
+          "target": "package.json",
+          "content": "{ \"name\": \"sandbox-test\", \"version\": \"1.0.0\", \"scripts\": { \"build\": \"exit 1\", \"typecheck\": \"node -e \\\"console.log('typechecking')\\\"\", \"lint\": \"node -e \\\"console.log('linting')\\\"\" } }"
+        }
+      ]
+    }
+  }
+]

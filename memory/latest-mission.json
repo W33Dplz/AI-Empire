@@ -1,0 +1,44 @@
+{
+  "meta": {
+    "missionId": "31946e1a-266f-4e10-a442-e1f23f82f3c9",
+    "projectId": "default-project",
+    "createdAt": "2026-02-13T15:05:55.385Z",
+    "version": "1.0"
+  },
+  "businessLayer": {
+    "rawVision": "Créer un nouveau module marketing sans toucher à l’existant",
+    "interpretedGoal": "Créer un nouveau module marketing sans toucher à l’existant",
+    "moduleType": "module",
+    "strategicIntent": "Contract-driven controlled integration"
+  },
+  "lovableLayer": {
+    "generatedPrompt": "\n🔒 CONTEXTE GLOBAL\n\nTu implémentes une nouvelle fonctionnalité sans casser ni modifier\naucun comportement existant.\n\n🎯 OBJECTIF\nCréer un nouveau module marketing sans toucher à l’existant\n\n⚠ CONTRAINTES ABSOLUES\n- Aucun impact existant\n- Aucune migration destructive\n- Respect strict du scope\n",
+    "phase": "MVP",
+    "constraintsInjected": [
+      "no-existing-break",
+      "no-destructive-migration"
+    ]
+  },
+  "scopeLayer": {
+    "allowedCreates": [],
+    "conditionalModifications": [],
+    "forbiddenAreas": [
+      "existing-modification"
+    ]
+  },
+  "invariantLayer": {
+    "noExistingBehaviorChange": true,
+    "noDestructiveOperations": true,
+    "respectPhaseScope": true
+  },
+  "riskLayer": {
+    "initialRiskScore": 60,
+    "riskCategory": "HIGH"
+  },
+  "impactPolicy": {
+    "autoCorrectLow": true,
+    "autoCorrectMedium": true,
+    "autoCorrectHighIfSafe": true,
+    "blockCritical": true
+  }
+}

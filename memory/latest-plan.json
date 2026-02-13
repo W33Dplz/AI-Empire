@@ -1,0 +1,10 @@
+{
+  "analysis": "Pour répondre à l'objectif de créer un nouveau module marketing sans impacter l'existant, il convient d'ajouter un nouveau fichier source dédié à ce module. Aucun fichier existant ne sera modifié, ce qui garantit l'absence d'impact sur le comportement actuel. Le nouveau module sera autonome et respectera strictement le scope défini.",
+  "steps": [
+    {
+      "type": "PATCH_FILE",
+      "target": "marketing_module.py",
+      "content": "# Nouveau module marketing\n\nclass MarketingModule:\n    def __init__(self):\n        pass\n\n    def launch_campaign(self, campaign_name):\n        print(f\"Lancement de la campagne marketing : {campaign_name}\")\n"
+    }
+  ]
+}
