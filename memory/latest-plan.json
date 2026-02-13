@@ -1,10 +1,10 @@
 {
-  "analysis": "Pour garantir une isolation stricte des tests dans un environnement sandbox, il faut ajouter une configuration ou un fichier dédié à la sandbox sans modifier les fichiers ou comportements existants. Cela permet de respecter l'absence d'impact sur l'existant et d'éviter toute migration destructive.",
+  "analysis": "Pour implémenter une nouvelle fonctionnalité dans core/logger.js sans impacter le comportement existant, il est nécessaire d'ajouter du code de manière non intrusive. Cela peut se faire en ajoutant une nouvelle fonction, une nouvelle classe, ou une nouvelle option, tout en s'assurant que le code existant n'est ni modifié ni supprimé. Cette approche garantit l'absence d'impact sur les fonctionnalités actuelles et respecte les contraintes de non-migration destructive.",
   "steps": [
     {
-      "type": "PATCH_FILE",
-      "target": "sandbox.config.js",
-      "content": "// Configuration dédiée à l'isolation stricte des tests en sandbox\nmodule.exports = {\n  isolated: true,\n  environment: 'sandbox',\n  resetMocks: true,\n  clearMocks: true,\n  restoreMocks: true\n};\n"
+      "type": "CONTEXT_ANALYSIS",
+      "target": "",
+      "content": "Analyser le contenu actuel de core/logger.js pour identifier où et comment ajouter la nouvelle fonctionnalité sans modifier le comportement existant."
     }
   ]
 }
