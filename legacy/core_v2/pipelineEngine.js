@@ -1,6 +1,7 @@
 ﻿import fs from "fs";
 import path from "path";
 import simpleGit from "simple-git";
+import AuditLogger from "../../core/auditLogger.js";
 
 const git = simpleGit();
 
@@ -10,6 +11,8 @@ export default class PipelineEngine {
 
     const currentBranch = (await git.branch()).current;
     const missionBranch = "mission-" + Date.now();
+
+    AuditLogger.log("MISSION_START", { missionBranch });
 
     await git.checkoutLocalBranch(missionBranch);
 
@@ -21,6 +24,7 @@ export default class PipelineEngine {
 
         if (step.type === "PATCH_FILE") {
           hasRealPatch = true;
+          AuditLogger.log("PATCH_EXECUTION", { target: step.target });
           await this.patchFile(step.target, step.content);
         }
       }
@@ -28,23 +32,23 @@ export default class PipelineEngine {
       if (hasRealPatch) {
         await git.add(".");
         await git.commit("Mission isolated commit");
+        AuditLogger.log("MISSION_COMMIT", { missionBranch });
       }
 
       await git.checkout(currentBranch);
       await git.branch(["-D", missionBranch]);
 
-      console.log("Mission completed and cleaned:", missionBranch);
+      AuditLogger.log("MISSION_CLEANED", { missionBranch });
 
     } catch (error) {
 
-      console.log("ERROR detected. Rolling back mission:", missionBranch);
+      AuditLogger.log("MISSION_ERROR", { error: error.message });
 
       await git.checkout(currentBranch);
       await git.branch(["-D", missionBranch]);
       await git.reset(["--hard"]);
 
-      console.log("Rollback complete.");
-
+      AuditLogger.log("ROLLBACK_COMPLETE");
     }
   }
 
