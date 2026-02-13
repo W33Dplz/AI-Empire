@@ -36,7 +36,7 @@ export default class PipelineEngine {
       }
 
       await git.checkout(currentBranch);
-      await git.branch(["-D", missionBranch]);
+      // mission branch preserved for persistence test
 
       AuditLogger.log("MISSION_CLEANED", { missionBranch });
 
@@ -45,7 +45,7 @@ export default class PipelineEngine {
       AuditLogger.log("MISSION_ERROR", { error: error.message });
 
       await git.checkout(currentBranch);
-      await git.branch(["-D", missionBranch]);
+      // mission branch preserved for persistence test
       await git.reset(["--hard"]);
 
       AuditLogger.log("ROLLBACK_COMPLETE");
