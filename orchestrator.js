@@ -53,7 +53,7 @@ async function generatePlan(objective) {
 
 async function main() {
 
-  const objective = process.argv.slice(2).join(" ");
+  const objective = process.argv.slice(2).join(" "); const injectionPatterns = ["ignore previous instructions","override security","execute arbitrary","system prompt"]; const lowerObjective = objective.toLowerCase(); if (injectionPatterns.some(p => lowerObjective.includes(p))) { AuditLogger.log("OBJECTIVE_BLOCKED", { objective }); return; }
   if (!objective) return;
 
   const pipeline = new PipelineEngine();
@@ -91,6 +91,7 @@ async function main() {
 }
 
 main();
+
 
 
 
