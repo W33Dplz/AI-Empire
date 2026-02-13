@@ -13,26 +13,39 @@ export default class PipelineEngine {
 
     await git.checkoutLocalBranch(missionBranch);
 
-    let hasRealPatch = false;
+    try {
 
-    for (const step of plan.steps) {
+      let hasRealPatch = false;
 
-      if (step.type === "PATCH_FILE") {
-        hasRealPatch = true;
-        await this.patchFile(step.target, step.content);
+      for (const step of plan.steps) {
+
+        if (step.type === "PATCH_FILE") {
+          hasRealPatch = true;
+          await this.patchFile(step.target, step.content);
+        }
       }
+
+      if (hasRealPatch) {
+        await git.add(".");
+        await git.commit("Mission isolated commit");
+      }
+
+      await git.checkout(currentBranch);
+      await git.branch(["-D", missionBranch]);
+
+      console.log("Mission completed and cleaned:", missionBranch);
+
+    } catch (error) {
+
+      console.log("ERROR detected. Rolling back mission:", missionBranch);
+
+      await git.checkout(currentBranch);
+      await git.branch(["-D", missionBranch]);
+      await git.reset(["--hard"]);
+
+      console.log("Rollback complete.");
+
     }
-
-    if (hasRealPatch) {
-      await git.add(".");
-      await git.commit("Mission isolated commit");
-    }
-
-    await git.checkout(currentBranch);
-
-    await git.branch(["-D", missionBranch]);
-
-    console.log("Mission branch cleaned:", missionBranch);
   }
 
   async patchFile(target, content) {
