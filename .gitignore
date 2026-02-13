@@ -35,3 +35,5 @@ orchestrator.patchContractGuard.backup.js
 core/riskGate.promptShield.backup.js
 
 core/riskGate.fullShield.backup.js
+
+orchestrator.objectiveShield.backup.js
