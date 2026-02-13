@@ -9,3 +9,5 @@ legacy/core_v2/*.branchIsolation.backup.js
 orchestrator.*.backup.js
 
 memory/latest-plan.json
+
+memory/latest-plan.json
