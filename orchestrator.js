@@ -4,6 +4,7 @@ import fs from "fs";
 import PipelineEngine from "./legacy/core_v2/pipelineEngine.js";
 import MissionDefinitionEngine from "./core/missionDefinitionEngine.js";
 import RiskGate from "./core/riskGate.js";
+import AuditLogger from "./core/auditLogger.js";
 
 dotenv.config();
 
@@ -12,17 +13,21 @@ const openai = new OpenAI({
 });
 
 function safeFallback(reason) {
+  AuditLogger.log("PLAN_BLOCKED", { reason });
   return {
-    analysis: "Blocked by RiskGate: " + reason,
+    analysis: "Blocked: " + reason,
     steps: [{ type: "NO_OP" }]
   };
 }
 
-function validatePlan(parsed) {
-  if (!parsed.steps || !Array.isArray(parsed.steps)) {
-    return safeFallback("Invalid structure");
+function validateStructure(plan) {
+  if (!plan.analysis || typeof plan.analysis !== "string") {
+    return false;
   }
-  return parsed;
+  if (!plan.steps || !Array.isArray(plan.steps)) {
+    return false;
+  }
+  return true;
 }
 
 async function generatePlan(objective) {
@@ -32,13 +37,18 @@ async function generatePlan(objective) {
     temperature: 0,
     response_format: { type: "json_object" },
     messages: [
-      { role: "system", content: "Return strict JSON {analysis, steps[]}" },
+      { role: "system", content: "Return strict JSON {analysis:string, steps:Array}" },
       { role: "user", content: objective }
     ]
   });
 
   const parsed = JSON.parse(response.choices[0].message.content);
-  return validatePlan(parsed);
+
+  if (!validateStructure(parsed)) {
+    return safeFallback("Invalid structure contract");
+  }
+
+  return parsed;
 }
 
 async function main() {
