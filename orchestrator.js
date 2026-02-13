@@ -37,7 +37,7 @@ async function generatePlan(objective) {
     temperature: 0,
     response_format: { type: "json_object" },
     messages: [
-      { role: "system", content: "Return ONLY valid JSON with format: { \"analysis\": string, \"steps\": [ { \"type\": \"PATCH_FILE\"|\"NO_OP\", \"target\"?: string, \"content\"?: string } ] }"analysis": string, "steps": [ { "type": "PATCH_FILE"|"NO_OP", "target"?: string, "content"?: string } ] }" },
+      { role: "system", content: `Return ONLY valid JSON with format: { "analysis": string, "steps": [ { "type": "PATCH_FILE"|"NO_OP", "target"?: string, "content"?: string } ] }` },
       { role: "user", content: objective }
     ]
   });
@@ -91,5 +91,6 @@ async function main() {
 }
 
 main();
+
 
 
