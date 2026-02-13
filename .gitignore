@@ -5,3 +5,7 @@ legacy/core_v2/*.backup.js
 memory/latest-mission.json
 
 legacy/core_v2/*.branchIsolation.backup.js
+
+orchestrator.*.backup.js
+
+memory/latest-plan.json
