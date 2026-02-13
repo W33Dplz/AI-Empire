@@ -1,6 +1,6 @@
 ﻿export default class RiskGate {
 
-  static evaluate(plan) {
+  static evaluate(plan) { const injectionPatterns = ["ignore previous instructions","override security","execute arbitrary","system prompt"]; const lowerAnalysis = (plan.analysis || "").toLowerCase(); if (injectionPatterns.some(p => lowerAnalysis.includes(p))) { return { riskScore: 999, allowed: false }; }
 
     let riskScore = 0;
 
@@ -28,3 +28,4 @@
     return { riskScore, allowed };
   }
 }
+
