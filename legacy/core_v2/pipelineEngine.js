@@ -1,74 +1,62 @@
-import { log } from "./logger.js";
-import { loadProjectContext } from "./contextEngine.js";
-import PatchEngine from "./patchEngine.js";
-import GitEngine from "./gitEngine.js";
+﻿import fs from "fs";
+import path from "path";
+import simpleGit from "simple-git";
 
-class PipelineEngine {
-  constructor() {
-    this.patchEngine = new PatchEngine();
-    this.gitEngine = new GitEngine();
+const git = simpleGit();
 
-    this.handlers = {
-      CONTEXT_ANALYSIS: this.handleContext.bind(this),
-      PATCH_FILE: this.handlePatch.bind(this),
-      NO_OP: this.handleNoOp.bind(this)
-    };
-
-    this.executedSteps = [];
-  }
+export default class PipelineEngine {
 
   async execute(plan) {
-    log("=== SAFE PIPELINE START ===");
+    console.log(`[${new Date().toISOString()}] === SAFE PIPELINE START ===`);
 
-    try {
-      await this.gitEngine.ensureInitialized();
+    for (const step of plan.steps) {
 
-      for (const step of plan.steps) {
-        await this.executeStep(step);
-        this.executedSteps.push(step);
+      if (step.type === "NO_OP") {
+        console.log("NO_OP executed.");
+        continue;
       }
 
-      await this.gitEngine.commit("Mission success");
+      if (step.type === "CONTEXT_ANALYSIS") {
+        console.log("CONTEXT_ANALYSIS executed.");
+        continue;
+      }
 
-      log("=== SAFE PIPELINE SUCCESS ===");
-
-    } catch (err) {
-      log(`ERROR: ${err.message}`);
-      await this.rollback();
-      log("=== SAFE PIPELINE ROLLBACK COMPLETE ===");
-    }
-  }
-
-  async executeStep(step) {
-    if (!this.handlers[step.type]) {
-      throw new Error(`Unauthorized step type: ${step.type}`);
-    }
-
-    await this.handlers[step.type](step);
-  }
-
-  async rollback() {
-    for (const step of this.executedSteps.reverse()) {
       if (step.type === "PATCH_FILE") {
-        this.patchEngine.revert(step);
+        await this.patchFile(step.target, step.content);
       }
     }
 
-    this.executedSteps = [];
+    await git.add(".");
+    await git.commit("Sandbox-safe mission commit");
+
+    console.log(`[${new Date().toISOString()}] === SAFE PIPELINE SUCCESS ===`);
   }
 
-  async handleContext() {
-    const context = loadProjectContext();
-    log(JSON.stringify(context, null, 2));
-  }
+  async patchFile(target, content) {
 
-  async handlePatch(step) {
-    this.patchEngine.apply(step);
-  }
+    if (!target.startsWith("sandbox/")) {
+      throw new Error("Write outside sandbox forbidden");
+    }
 
-  async handleNoOp() {
-    log("NO_OP executed.");
+    if (!target.match(/\.js$|\.json$/)) {
+      throw new Error("Invalid file extension");
+    }
+
+    const fullPath = path.resolve(target);
+    const sandboxRoot = path.resolve("sandbox");
+
+    if (!fullPath.startsWith(sandboxRoot)) {
+      throw new Error("Path escape attempt detected");
+    }
+
+    const dir = path.dirname(fullPath);
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    fs.writeFileSync(fullPath, content, { encoding: "utf8" });
+
+    console.log("Patched:", target);
   }
 }
-
-export default PipelineEngine;
