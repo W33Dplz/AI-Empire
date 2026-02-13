@@ -13,14 +13,9 @@ export default class PipelineEngine {
 
     await git.checkoutLocalBranch(missionBranch);
 
-    console.log(`[${new Date().toISOString()}] === SAFE PIPELINE START (${missionBranch}) ===`);
-
     let hasRealPatch = false;
 
     for (const step of plan.steps) {
-
-      if (step.type === "NO_OP") continue;
-      if (step.type === "CONTEXT_ANALYSIS") continue;
 
       if (step.type === "PATCH_FILE") {
         hasRealPatch = true;
@@ -31,12 +26,13 @@ export default class PipelineEngine {
     if (hasRealPatch) {
       await git.add(".");
       await git.commit("Mission isolated commit");
-      console.log("Mission commit created.");
     }
 
     await git.checkout(currentBranch);
 
-    console.log(`[${new Date().toISOString()}] === PIPELINE RETURNED TO ${currentBranch} ===`);
+    await git.branch(["-D", missionBranch]);
+
+    console.log("Mission branch cleaned:", missionBranch);
   }
 
   async patchFile(target, content) {
