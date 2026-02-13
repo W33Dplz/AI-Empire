@@ -26,3 +26,7 @@
     };
   }
 }
+
+// HARDENING: Block multiple PATCH_FILE steps
+
+if (plan.steps.filter(s => s.type === 'PATCH_FILE').length > 1) { return { riskScore: 999, allowed: false }; }
