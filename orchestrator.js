@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import fs from "fs";
 import PipelineEngine from "./legacy/core_v2/pipelineEngine.js";
 import MissionDefinitionEngine from "./core/missionDefinitionEngine.js";
+import RiskGate from "./core/riskGate.js";
 
 dotenv.config();
 
@@ -12,50 +13,26 @@ const openai = new OpenAI({
 
 function safeFallback(reason) {
   return {
-    analysis: "Auto fallback: " + reason,
+    analysis: "Blocked by RiskGate: " + reason,
     steps: [{ type: "NO_OP" }]
   };
 }
 
 function validatePlan(parsed) {
-  const allowedTypes = ["CONTEXT_ANALYSIS","PATCH_FILE","NO_OP"];
-
   if (!parsed.steps || !Array.isArray(parsed.steps)) {
-    return safeFallback("Missing steps");
+    return safeFallback("Invalid structure");
   }
-
-  for (const step of parsed.steps) {
-    if (!allowedTypes.includes(step.type)) {
-      return safeFallback("Unauthorized step type");
-    }
-
-    if (step.type === "PATCH_FILE") {
-      if (!step.target || !step.target.startsWith("sandbox/")) {
-        return safeFallback("Outside sandbox");
-      }
-
-      if (!step.target.match(/\.js$|\.json$/)) {
-        return safeFallback("Invalid extension");
-      }
-    }
-  }
-
   return parsed;
 }
 
 async function generatePlan(objective) {
-  const systemPrompt = `
-You are a STRICT contract-based planner.
-All PATCH_FILE targets MUST start with "sandbox/".
-Return valid JSON only.
-`;
 
   const response = await openai.chat.completions.create({
     model: "gpt-4.1",
     temperature: 0,
     response_format: { type: "json_object" },
     messages: [
-      { role: "system", content: systemPrompt },
+      { role: "system", content: "Return strict JSON {analysis, steps[]}" },
       { role: "user", content: objective }
     ]
   });
@@ -65,12 +42,9 @@ Return valid JSON only.
 }
 
 async function main() {
-  const objective = process.argv.slice(2).join(" ");
 
-  if (!objective) {
-    console.log('Usage: node orchestrator.js "Your objective"');
-    return;
-  }
+  const objective = process.argv.slice(2).join(" ");
+  if (!objective) return;
 
   const pipeline = new PipelineEngine();
 
@@ -85,17 +59,25 @@ async function main() {
     { encoding: "utf8" }
   );
 
-  const plan = await generatePlan(
+  const rawPlan = await generatePlan(
     mission.lovableLayer.generatedPrompt
   );
 
+  const riskEvaluation = RiskGate.evaluate(rawPlan);
+
+  console.log("Risk score:", riskEvaluation.riskScore);
+
+  const finalPlan = riskEvaluation.allowed
+    ? rawPlan
+    : safeFallback("Risk too high");
+
   fs.writeFileSync(
     "./memory/latest-plan.json",
-    JSON.stringify(plan, null, 2),
+    JSON.stringify(finalPlan, null, 2),
     { encoding: "utf8" }
   );
 
-  await pipeline.execute(plan);
+  await pipeline.execute(finalPlan);
 }
 
 main();
