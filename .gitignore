@@ -11,3 +11,5 @@ orchestrator.*.backup.js
 memory/latest-plan.json
 
 memory/latest-plan.json
+
+core/riskGate.*.backup.js
