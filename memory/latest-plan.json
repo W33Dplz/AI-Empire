@@ -1,10 +1,16 @@
 {
-  "analysis": "Pour répondre à l'objectif de créer un nouveau module marketing sans impacter l'existant, il convient d'ajouter un nouveau fichier source dédié à ce module. Aucun fichier existant ne sera modifié, ce qui garantit l'absence d'impact sur le comportement actuel. Le nouveau module sera autonome et respectera strictement le scope défini.",
   "steps": [
     {
-      "type": "PATCH_FILE",
-      "target": "marketing_module.py",
-      "content": "# Nouveau module marketing\n\nclass MarketingModule:\n    def __init__(self):\n        pass\n\n    def launch_campaign(self, campaign_name):\n        print(f\"Lancement de la campagne marketing : {campaign_name}\")\n"
+      "step": "CONTEXT_ANALYSIS",
+      "reasoning": "Analyser la structure actuelle du projet pour identifier où et comment ajouter un nouveau module marketing sans impacter l'existant.",
+      "type": "CONTEXT_ANALYSIS"
+    },
+    {
+      "step": "PATCH_FILE",
+      "target": "marketingModule.js",
+      "content": "// Nouveau module marketing isolé\n\nexport function launchMarketingCampaign(options) {\n  // Logique marketing isolée\n  console.log('Lancement de la campagne marketing avec options:', options);\n  // TODO: Ajouter ici les fonctionnalités marketing spécifiques\n  return {\n    status: 'success',\n    details: options\n  };\n}\n",
+      "reasoning": "Créer un nouveau fichier JavaScript pour le module marketing, totalement isolé, sans modifier l'existant.",
+      "type": "PATCH_FILE"
     }
   ]
 }

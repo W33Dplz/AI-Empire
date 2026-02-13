@@ -10,56 +10,54 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-function safeParse(content) {
-  try {
-    const parsed = JSON.parse(content);
+function validatePlan(parsed) {
+  const allowedTypes = ["CONTEXT_ANALYSIS","PATCH_FILE","NO_OP"];
 
-    if (!parsed.steps || !Array.isArray(parsed.steps)) {
-      throw new Error("Invalid plan structure");
+  if (!parsed.steps || !Array.isArray(parsed.steps)) {
+    throw new Error("Invalid plan structure");
+  }
+
+  // Normalisation automatique du format modèle
+  parsed.steps = parsed.steps.map(s => {
+    if (s.step && !s.type) s.type = s.step;
+    if (s.patch && !s.content) s.content = s.patch;
+    return s;
+  });
+
+  for (const step of parsed.steps) {
+    if (!allowedTypes.includes(step.type)) {
+      throw new Error("Unauthorized step type");
     }
 
-    return parsed;
-  } catch (err) {
-    throw new Error("Model returned invalid JSON structure");
+    if (step.type === "PATCH_FILE") {
+      if (!step.target.match(/\.js$|\.json$/)) {
+        throw new Error("Unauthorized file extension");
+      }
+    }
   }
+
+  return parsed;
 }
 
 async function generatePlan(objective) {
+  const systemPrompt =
+    "You are a safe AI planner. " +
+    "Allowed steps: CONTEXT_ANALYSIS, PATCH_FILE, NO_OP. " +
+    "PATCH_FILE must target only .js or .json files. " +
+    "Return strictly valid JSON.";
+
   const response = await openai.chat.completions.create({
     model: "gpt-4.1",
     temperature: 0.2,
+    response_format: { type: "json_object" },
     messages: [
-      {
-        role: "system",
-        content: `
-You are a safe AI planner.
-
-Allowed steps:
-- CONTEXT_ANALYSIS
-- PATCH_FILE
-- NO_OP
-
-Return ONLY valid JSON in this format:
-
-{
-  "analysis": "...",
-  "steps": [
-    {
-      "type": "PATCH_FILE",
-      "target": "example.txt",
-      "content": "example"
-    }
-  ]
-}
-
-PATCH_FILE must target only files (no folders).
-`
-      },
+      { role: "system", content: systemPrompt },
       { role: "user", content: objective }
     ]
   });
 
-  return safeParse(response.choices[0].message.content);
+  const parsed = JSON.parse(response.choices[0].message.content);
+  return validatePlan(parsed);
 }
 
 async function main() {
@@ -72,7 +70,6 @@ async function main() {
 
   const pipeline = new PipelineEngine();
 
-  // 🔒 Mission contract layer
   const mission = MissionDefinitionEngine.generateMission(
     "default-project",
     objective
@@ -80,7 +77,8 @@ async function main() {
 
   fs.writeFileSync(
     "./memory/latest-mission.json",
-    JSON.stringify(mission, null, 2)
+    JSON.stringify(mission, null, 2),
+    { encoding: "utf8" }
   );
 
   const plan = await generatePlan(
@@ -89,7 +87,8 @@ async function main() {
 
   fs.writeFileSync(
     "./memory/latest-plan.json",
-    JSON.stringify(plan, null, 2)
+    JSON.stringify(plan, null, 2),
+    { encoding: "utf8" }
   );
 
   await pipeline.execute(plan);
