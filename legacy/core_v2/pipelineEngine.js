@@ -9,6 +9,8 @@ export default class PipelineEngine {
   async execute(plan) {
     console.log(`[${new Date().toISOString()}] === SAFE PIPELINE START ===`);
 
+    let hasRealPatch = false;
+
     for (const step of plan.steps) {
 
       if (step.type === "NO_OP") {
@@ -22,12 +24,18 @@ export default class PipelineEngine {
       }
 
       if (step.type === "PATCH_FILE") {
+        hasRealPatch = true;
         await this.patchFile(step.target, step.content);
       }
     }
 
-    await git.add(".");
-    await git.commit("Sandbox-safe mission commit");
+    if (hasRealPatch) {
+      await git.add(".");
+      await git.commit("Sandbox-safe mission commit");
+      console.log("Commit created.");
+    } else {
+      console.log("No real patch detected — commit skipped.");
+    }
 
     console.log(`[${new Date().toISOString()}] === SAFE PIPELINE SUCCESS ===`);
   }
