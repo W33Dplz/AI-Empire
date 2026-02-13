@@ -23,3 +23,5 @@ legacy/core_v2/pipelineEngine.persist.backup.js
 orchestrator.contractLock.backup.js
 
 orchestrator.schemaLock.backup.js
+
+orchestrator.schemaFix.backup.js
