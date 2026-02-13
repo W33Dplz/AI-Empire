@@ -25,3 +25,5 @@ orchestrator.contractLock.backup.js
 orchestrator.schemaLock.backup.js
 
 orchestrator.schemaFix.backup.js
+
+orchestrator.schemaFixV2.backup.js
