@@ -31,3 +31,5 @@ orchestrator.schemaFixV2.backup.js
 orchestrator.cleanSchemaRewrite.backup.js
 
 orchestrator.patchContractGuard.backup.js
+
+core/riskGate.promptShield.backup.js
