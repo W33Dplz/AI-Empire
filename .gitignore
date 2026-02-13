@@ -17,3 +17,5 @@ core/riskGate.*.backup.js
 orchestrator.strictGuard.backup.js
 
 core/riskGate.finalShield.backup.js
+
+legacy/core_v2/pipelineEngine.persist.backup.js
