@@ -1,10 +1,8 @@
 {
-  "analysis": "L'objectif est de modifier le fichier sandbox/testFile.js pour implémenter une nouvelle fonctionnalité, tout en garantissant qu'aucun comportement existant n'est modifié ou cassé. Il est impératif de respecter le scope et de ne pas introduire de migrations destructives ni d'impacts sur le code existant.",
+  "analysis": "Auto fallback: Unauthorized step type",
   "steps": [
     {
-      "type": "CONTEXT_ANALYSIS",
-      "target": "",
-      "content": "Analyser le contenu actuel de sandbox/testFile.js afin d'identifier les zones où une nouvelle fonctionnalité peut être ajoutée sans affecter le comportement existant."
+      "type": "NO_OP"
     }
   ]
 }

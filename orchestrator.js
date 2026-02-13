@@ -10,21 +10,32 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+function safeFallback(reason) {
+  return {
+    analysis: "Auto fallback: " + reason,
+    steps: [{ type: "NO_OP" }]
+  };
+}
+
 function validatePlan(parsed) {
   const allowedTypes = ["CONTEXT_ANALYSIS","PATCH_FILE","NO_OP"];
 
   if (!parsed.steps || !Array.isArray(parsed.steps)) {
-    throw new Error("Invalid plan structure");
+    return safeFallback("Missing steps");
   }
 
   for (const step of parsed.steps) {
     if (!allowedTypes.includes(step.type)) {
-      throw new Error("Unauthorized step type");
+      return safeFallback("Unauthorized step type");
     }
 
     if (step.type === "PATCH_FILE") {
-      if (!step.target || !step.target.match(/\.js$|\.json$/)) {
-        throw new Error("Unauthorized file extension");
+      if (!step.target || !step.target.startsWith("sandbox/")) {
+        return safeFallback("Outside sandbox");
+      }
+
+      if (!step.target.match(/\.js$|\.json$/)) {
+        return safeFallback("Invalid extension");
       }
     }
   }
@@ -35,23 +46,8 @@ function validatePlan(parsed) {
 async function generatePlan(objective) {
   const systemPrompt = `
 You are a STRICT contract-based planner.
-
-You MUST return valid JSON only in this exact structure:
-
-{
-  "analysis": "string",
-  "steps": [
-    {
-      "type": "CONTEXT_ANALYSIS" | "PATCH_FILE" | "NO_OP",
-      "target": "string (required for PATCH_FILE)",
-      "content": "string (required for PATCH_FILE)"
-    }
-  ]
-}
-
-Do NOT use "step".
-Do NOT use "patch".
-Do NOT invent fields.
+All PATCH_FILE targets MUST start with "sandbox/".
+Return valid JSON only.
 `;
 
   const response = await openai.chat.completions.create({
