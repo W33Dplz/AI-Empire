@@ -1,18 +1,18 @@
 {
   "meta": {
-    "missionId": "5da86daf-9dc4-4d9e-aae5-6d31a28542a9",
+    "missionId": "5793fe0e-ea0a-4404-ab0b-9aa479b0e9e2",
     "projectId": "default-project",
-    "createdAt": "2026-02-13T16:07:42.213Z",
+    "createdAt": "2026-02-13T16:09:06.289Z",
     "version": "1.0"
   },
   "businessLayer": {
-    "rawVision": "Test sandbox stability",
-    "interpretedGoal": "Test sandbox stability",
+    "rawVision": "Audit pipelineEngine for sandbox-only write enforcement",
+    "interpretedGoal": "Audit pipelineEngine for sandbox-only write enforcement",
     "moduleType": "feature",
     "strategicIntent": "Contract-driven controlled integration"
   },
   "lovableLayer": {
-    "generatedPrompt": "\n🔒 CONTEXTE GLOBAL\n\nTu implémentes une nouvelle fonctionnalité sans casser ni modifier\naucun comportement existant.\n\n🎯 OBJECTIF\nTest sandbox stability\n\n⚠ CONTRAINTES ABSOLUES\n- Aucun impact existant\n- Aucune migration destructive\n- Respect strict du scope\n",
+    "generatedPrompt": "\n🔒 CONTEXTE GLOBAL\n\nTu implémentes une nouvelle fonctionnalité sans casser ni modifier\naucun comportement existant.\n\n🎯 OBJECTIF\nAudit pipelineEngine for sandbox-only write enforcement\n\n⚠ CONTRAINTES ABSOLUES\n- Aucun impact existant\n- Aucune migration destructive\n- Respect strict du scope\n",
     "phase": "MVP",
     "constraintsInjected": [
       "no-existing-break",
