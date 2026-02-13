@@ -27,3 +27,5 @@ orchestrator.schemaLock.backup.js
 orchestrator.schemaFix.backup.js
 
 orchestrator.schemaFixV2.backup.js
+
+orchestrator.cleanSchemaRewrite.backup.js
