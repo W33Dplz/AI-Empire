@@ -1,16 +1,10 @@
 {
+  "analysis": "Pour garantir une isolation stricte des tests dans un environnement sandbox, il faut ajouter une configuration ou un fichier dédié à la sandbox sans modifier les fichiers ou comportements existants. Cela permet de respecter l'absence d'impact sur l'existant et d'éviter toute migration destructive.",
   "steps": [
     {
-      "step": "CONTEXT_ANALYSIS",
-      "reasoning": "Analyser la structure actuelle du projet pour identifier où et comment ajouter un nouveau module marketing sans impacter l'existant.",
-      "type": "CONTEXT_ANALYSIS"
-    },
-    {
-      "step": "PATCH_FILE",
-      "target": "marketingModule.js",
-      "content": "// Nouveau module marketing isolé\n\nexport function launchMarketingCampaign(options) {\n  // Logique marketing isolée\n  console.log('Lancement de la campagne marketing avec options:', options);\n  // TODO: Ajouter ici les fonctionnalités marketing spécifiques\n  return {\n    status: 'success',\n    details: options\n  };\n}\n",
-      "reasoning": "Créer un nouveau fichier JavaScript pour le module marketing, totalement isolé, sans modifier l'existant.",
-      "type": "PATCH_FILE"
+      "type": "PATCH_FILE",
+      "target": "sandbox.config.js",
+      "content": "// Configuration dédiée à l'isolation stricte des tests en sandbox\nmodule.exports = {\n  isolated: true,\n  environment: 'sandbox',\n  resetMocks: true,\n  clearMocks: true,\n  restoreMocks: true\n};\n"
     }
   ]
 }

@@ -17,20 +17,13 @@ function validatePlan(parsed) {
     throw new Error("Invalid plan structure");
   }
 
-  // Normalisation automatique du format modèle
-  parsed.steps = parsed.steps.map(s => {
-    if (s.step && !s.type) s.type = s.step;
-    if (s.patch && !s.content) s.content = s.patch;
-    return s;
-  });
-
   for (const step of parsed.steps) {
     if (!allowedTypes.includes(step.type)) {
       throw new Error("Unauthorized step type");
     }
 
     if (step.type === "PATCH_FILE") {
-      if (!step.target.match(/\.js$|\.json$/)) {
+      if (!step.target || !step.target.match(/\.js$|\.json$/)) {
         throw new Error("Unauthorized file extension");
       }
     }
@@ -40,15 +33,30 @@ function validatePlan(parsed) {
 }
 
 async function generatePlan(objective) {
-  const systemPrompt =
-    "You are a safe AI planner. " +
-    "Allowed steps: CONTEXT_ANALYSIS, PATCH_FILE, NO_OP. " +
-    "PATCH_FILE must target only .js or .json files. " +
-    "Return strictly valid JSON.";
+  const systemPrompt = `
+You are a STRICT contract-based planner.
+
+You MUST return valid JSON only in this exact structure:
+
+{
+  "analysis": "string",
+  "steps": [
+    {
+      "type": "CONTEXT_ANALYSIS" | "PATCH_FILE" | "NO_OP",
+      "target": "string (required for PATCH_FILE)",
+      "content": "string (required for PATCH_FILE)"
+    }
+  ]
+}
+
+Do NOT use "step".
+Do NOT use "patch".
+Do NOT invent fields.
+`;
 
   const response = await openai.chat.completions.create({
     model: "gpt-4.1",
-    temperature: 0.2,
+    temperature: 0,
     response_format: { type: "json_object" },
     messages: [
       { role: "system", content: systemPrompt },

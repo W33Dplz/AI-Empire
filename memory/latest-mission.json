@@ -1,18 +1,18 @@
 {
   "meta": {
-    "missionId": "6716bd9a-ae51-4ead-b312-b17c4a42ee21",
+    "missionId": "795c6f70-a58f-427e-9fa2-6c05fade1e61",
     "projectId": "default-project",
-    "createdAt": "2026-02-13T15:50:58.671Z",
+    "createdAt": "2026-02-13T16:01:53.613Z",
     "version": "1.0"
   },
   "businessLayer": {
-    "rawVision": "Créer un nouveau module marketing sans toucher à l’existant",
-    "interpretedGoal": "Créer un nouveau module marketing sans toucher à l’existant",
-    "moduleType": "module",
+    "rawVision": "Test isolation stricte sandbox sans modification existante",
+    "interpretedGoal": "Test isolation stricte sandbox sans modification existante",
+    "moduleType": "feature",
     "strategicIntent": "Contract-driven controlled integration"
   },
   "lovableLayer": {
-    "generatedPrompt": "\n🔒 CONTEXTE GLOBAL\n\nTu implémentes une nouvelle fonctionnalité sans casser ni modifier\naucun comportement existant.\n\n🎯 OBJECTIF\nCréer un nouveau module marketing sans toucher à l’existant\n\n⚠ CONTRAINTES ABSOLUES\n- Aucun impact existant\n- Aucune migration destructive\n- Respect strict du scope\n",
+    "generatedPrompt": "\n🔒 CONTEXTE GLOBAL\n\nTu implémentes une nouvelle fonctionnalité sans casser ni modifier\naucun comportement existant.\n\n🎯 OBJECTIF\nTest isolation stricte sandbox sans modification existante\n\n⚠ CONTRAINTES ABSOLUES\n- Aucun impact existant\n- Aucune migration destructive\n- Respect strict du scope\n",
     "phase": "MVP",
     "constraintsInjected": [
       "no-existing-break",
@@ -22,9 +22,7 @@
   "scopeLayer": {
     "allowedCreates": [],
     "conditionalModifications": [],
-    "forbiddenAreas": [
-      "existing-modification"
-    ]
+    "forbiddenAreas": []
   },
   "invariantLayer": {
     "noExistingBehaviorChange": true,
@@ -32,8 +30,8 @@
     "respectPhaseScope": true
   },
   "riskLayer": {
-    "initialRiskScore": 60,
-    "riskCategory": "HIGH"
+    "initialRiskScore": 30,
+    "riskCategory": "LOW"
   },
   "impactPolicy": {
     "autoCorrectLow": true,
