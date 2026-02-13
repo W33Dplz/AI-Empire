@@ -48,7 +48,7 @@ async function generatePlan(objective) {
     return safeFallback("Invalid structure contract");
   }
 
-  return parsed;
+  if (!parsed.steps.every(s => typeof s === "object" && s.type)) { return safeFallback("Invalid step contract"); } return parsed;
 }
 
 async function main() {
