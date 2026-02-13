@@ -1,10 +1,10 @@
 {
-  "analysis": "Pour implémenter une nouvelle fonctionnalité dans core/logger.js sans impacter le comportement existant, il est nécessaire d'ajouter du code de manière non intrusive. Cela peut se faire en ajoutant une nouvelle fonction, une nouvelle classe, ou une nouvelle option, tout en s'assurant que le code existant n'est ni modifié ni supprimé. Cette approche garantit l'absence d'impact sur les fonctionnalités actuelles et respecte les contraintes de non-migration destructive.",
+  "analysis": "L'objectif est de modifier le fichier sandbox/testFile.js pour implémenter une nouvelle fonctionnalité, tout en garantissant qu'aucun comportement existant n'est modifié ou cassé. Il est impératif de respecter le scope et de ne pas introduire de migrations destructives ni d'impacts sur le code existant.",
   "steps": [
     {
       "type": "CONTEXT_ANALYSIS",
       "target": "",
-      "content": "Analyser le contenu actuel de core/logger.js pour identifier où et comment ajouter la nouvelle fonctionnalité sans modifier le comportement existant."
+      "content": "Analyser le contenu actuel de sandbox/testFile.js afin d'identifier les zones où une nouvelle fonctionnalité peut être ajoutée sans affecter le comportement existant."
     }
   ]
 }
