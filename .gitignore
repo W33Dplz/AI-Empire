@@ -13,3 +13,5 @@ memory/latest-plan.json
 memory/latest-plan.json
 
 core/riskGate.*.backup.js
+
+orchestrator.strictGuard.backup.js
