@@ -48,7 +48,7 @@ async function generatePlan(objective) {
     return safeFallback("Invalid structure contract");
   }
 
-  if (!parsed.steps.every(s => typeof s === "object" && s.type)) { return safeFallback("Invalid step contract"); } return parsed;
+  if (!parsed.steps.every(s => typeof s === "object" && s.type)) { return safeFallback("Invalid step contract"); } if (parsed.steps.some(s => s.type === "PATCH_FILE" && (!s.target || !s.content))) { return safeFallback("Invalid PATCH_FILE contract"); } return parsed;
 }
 
 async function main() {
@@ -91,6 +91,7 @@ async function main() {
 }
 
 main();
+
 
 
 
