@@ -7,21 +7,20 @@ const git = simpleGit();
 export default class PipelineEngine {
 
   async execute(plan) {
-    console.log(`[${new Date().toISOString()}] === SAFE PIPELINE START ===`);
+
+    const currentBranch = (await git.branch()).current;
+    const missionBranch = "mission-" + Date.now();
+
+    await git.checkoutLocalBranch(missionBranch);
+
+    console.log(`[${new Date().toISOString()}] === SAFE PIPELINE START (${missionBranch}) ===`);
 
     let hasRealPatch = false;
 
     for (const step of plan.steps) {
 
-      if (step.type === "NO_OP") {
-        console.log("NO_OP executed.");
-        continue;
-      }
-
-      if (step.type === "CONTEXT_ANALYSIS") {
-        console.log("CONTEXT_ANALYSIS executed.");
-        continue;
-      }
+      if (step.type === "NO_OP") continue;
+      if (step.type === "CONTEXT_ANALYSIS") continue;
 
       if (step.type === "PATCH_FILE") {
         hasRealPatch = true;
@@ -31,13 +30,13 @@ export default class PipelineEngine {
 
     if (hasRealPatch) {
       await git.add(".");
-      await git.commit("Sandbox-safe mission commit");
-      console.log("Commit created.");
-    } else {
-      console.log("No real patch detected — commit skipped.");
+      await git.commit("Mission isolated commit");
+      console.log("Mission commit created.");
     }
 
-    console.log(`[${new Date().toISOString()}] === SAFE PIPELINE SUCCESS ===`);
+    await git.checkout(currentBranch);
+
+    console.log(`[${new Date().toISOString()}] === PIPELINE RETURNED TO ${currentBranch} ===`);
   }
 
   async patchFile(target, content) {
@@ -64,7 +63,5 @@ export default class PipelineEngine {
     }
 
     fs.writeFileSync(fullPath, content, { encoding: "utf8" });
-
-    console.log("Patched:", target);
   }
 }
