@@ -37,3 +37,5 @@ core/riskGate.promptShield.backup.js
 core/riskGate.fullShield.backup.js
 
 orchestrator.objectiveShield.backup.js
+
+manifest/CHAT-START-TEMPLATE_V4.backup.md
