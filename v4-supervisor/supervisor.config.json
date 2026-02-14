@@ -1,0 +1,8 @@
+﻿{
+  "repositoryMode": "manual-trigger",
+  "watchBranch": "lovable-dev",
+  "targetBranch": "main",
+  "autoMerge": false,
+  "requireCertification": true,
+  "version": "V4"
+}
