@@ -7,6 +7,8 @@ import { runFixEngine } from "./fix/fixEngine.mjs";
 import { runRegressionGuardV2 } from "./regression/regressionGuardV2.mjs";
 import { runArchitecturalScoreEngine } from "./scoring/architecturalScoreEngine.mjs";
 import { runBaselineEngine } from "./baseline/baselineEngine.mjs";
+import { runIntentClassifier } from "./intent/intentClassifier.mjs";
+import { runDecisionEngine } from "./decision/decisionEngine.mjs";
 
 export async function runSupervisor(repoPath) {
 
@@ -61,23 +63,18 @@ export async function runSupervisor(repoPath) {
         architecturalScore.architecturalScore
     );
 
-    let overallStatus = "READY";
-    let requiresHumanReview = false;
+    const intent = runIntentClassifier(
+        intake.diffSummary,
+        architecturalImpact,
+        regressionGuard
+    );
 
-    if (architecturalScore.decisionHint === "DANGEROUS") {
-        overallStatus = "BLOCKED";
-        requiresHumanReview = true;
-    } else if (architecturalScore.decisionHint === "REVIEW_REQUIRED") {
-        overallStatus = "REVIEW";
-        requiresHumanReview = true;
-    }
-
-    if (baseline.aggravationDetected) {
-        requiresHumanReview = true;
-        if (architecturalScore.architecturalScore <= 60) {
-            overallStatus = "BLOCKED";
-        }
-    }
+    const decision = runDecisionEngine(
+        architecturalScore,
+        regressionGuard,
+        intent,
+        baseline
+    );
 
     return {
         intake,
@@ -86,10 +83,10 @@ export async function runSupervisor(repoPath) {
         regressionGuard,
         architecturalScore,
         baseline,
+        intent,
         audit,
         test,
         fix,
-        overallStatus,
-        requiresHumanReview
+        decision
     };
 }
