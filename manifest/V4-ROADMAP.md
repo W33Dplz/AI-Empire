@@ -1,42 +1,51 @@
-﻿# AI-EMPIRE V4 — ROADMAP (Phase 1)
+﻿# AI-EMPIRE V4 ROADMAP
 
-## Step 1 — Code Intake Engine
-- Detect Lovable output
-- Parse project structure
-- Normalize files
-- Snapshot baseline
+## Phase 1 – Intake Engine
 
-## Step 2 — Audit Engine
-- Security scan
-- Dependency scan
-- Architecture consistency scan
-- Logic safety scan
+- Detect new push in lovable-dev
+- Pull latest commit
+- Compute full diff
+- Build impact graph
 
-## Step 3 — Test Automation Engine
-- Type checking
-- Lint
-- Unit test auto generation
-- Coverage report
+## Phase 2 – Audit Engine
 
-## Step 4 — Correction Engine
-- Auto-fix safe issues
-- Suggest structural refactors
+- Structural audit
+- Dependency integrity
+- Security validation
+- Business rule integrity
+
+## Phase 3 – Test Engine
+
+- Unit tests
+- Integration tests
+- Regression tests
+- Feature validation mapping
+
+## Phase 4 – Fix Engine
+
+- Attempt automatic fixes
 - Re-run tests
+- Abort if instability persists
 
-## Step 5 — Optimization Engine
-- Performance hints
-- Refactor suggestions
-- Dead code detection
+## Phase 5 – Optimization Engine
 
-## Step 6 — Conformity Gate
-- Validate against initial request
-- Validate business logic
-- Validate architecture consistency
+- Detect redundancies
+- Improve structure
+- Improve maintainability
 
-## Step 7 — Product Intelligence Report
-- Technical health score
-- Risk level
-- Suggested improvements
-- Business leverage insights
+## Phase 6 – Certification Engine
 
-Target: Fully operational supervision loop.
+- Validate full repository integrity
+- Generate stability score
+- Produce certification report
+
+## Phase 7 – Multi-Project Expansion
+
+- Project registry
+- Baseline detection per project
+- Cross-project supervision
+
+Target:
+Supervisor Engine production-ready in 1 week.
+
+Version: V4.2

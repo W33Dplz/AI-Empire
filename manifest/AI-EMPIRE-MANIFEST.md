@@ -1,77 +1,100 @@
-﻿# AI-EMPIRE V4 — META ARCHITECT FOR LOVABLE
+﻿# AI-EMPIRE V4 — SUPERVISOR MODE OFFICIAL MANIFEST
 
-## 🎯 Mission
+## 🎯 Strategic Positioning
 
-AI-EMPIRE is now a Meta-Architect supervising Lovable-generated systems.
+AI-EMPIRE is no longer a code generator.
+AI-EMPIRE is now a Lovable Supervision Engine.
 
-Primary Objective:
-Supervise, audit, test, correct, optimize and certify Lovable code automatically.
-
-AI-EMPIRE does NOT generate core architecture.
 Lovable builds.
 AI-EMPIRE supervises.
 
----
+Lovable pushes to lovable-dev.
+AI-EMPIRE audits, tests, fixes, optimizes and certifies before merge to main.
 
-## 🧠 Strategic Positioning
-
-AI-EMPIRE is a Post-Lovable Supervision Layer.
-
-It acts as:
-
-- Code Intake Engine
-- Audit Engine
-- Test Automation Engine
-- Correction Engine
-- Optimization Engine
-- Certification Gate
-- Product Intelligence Reporter
+Main branch is protected.
+lovable-dev is volatile.
 
 ---
 
-## 🔄 Phase 1 — Immediate Focus
+## 🧠 Core Role
 
-1. Code Retrieval Layer
-2. Static Audit Layer
-3. Test Automation Layer
-4. Self-Correction Layer
-5. Optimization Layer
-6. Conformity Certification
-7. Clean Release Preparation
-8. Product & Business Improvement Report
+AI-EMPIRE V4 is responsible for:
 
----
+- Reading full repository structure
+- Detecting diffs from last push
+- Auditing code quality and structural coherence
+- Running full test suite
+- Detecting regressions
+- Fixing issues when possible
+- Re-testing after fix
+- Certifying stability
+- Generating product report
+- Preparing clean merge to main
 
-## 🧱 What AI-EMPIRE is NOT
-
-- Not a code generator
-- Not replacing Lovable
-- Not a sandbox runtime platform
-- Not an infrastructure orchestration system
-
----
-
-## 🧭 Operating Mode
-
-Mode A — Autonomous Supervision
-Lovable builds → AI-EMPIRE supervises → Charles validates only at decision gate.
+It must never:
+- Rewrite global architecture
+- Destroy existing stable logic
+- Force destructive resets
+- Modify protected main directly
 
 ---
 
-## 📌 Architectural Direction
+## 🔁 Operational Flow
 
-The focus is now:
-Stability > Safety > Automation > Optimization > Business Intelligence
-
-Prompt Engineering is postponed to Phase 2.
+Lovable → lovable-dev
+↓
+AI-EMPIRE Intake
+↓
+Audit
+↓
+Test
+↓
+Fix (if needed)
+↓
+Re-test
+↓
+Optimize
+↓
+Certification
+↓
+Manual merge to main
 
 ---
 
-## 🚀 Immediate Target (7 Days)
+## 🧱 Legacy Reuse Policy
 
-Deliver a working:
+The following V3 modules remain reusable:
 
-Code → Audit → Test → Fix → Certify → Report pipeline.
+- core/risk engine
+- sandbox manager
+- missionDefinitionEngine
+- logger
+- git isolation logic
+- worker queue protections
 
-No deviation.
+V3 Orchestrator logic is archived under legacy_v3.
 
+---
+
+## 🧠 Multi-Project Target
+
+AI-EMPIRE V4 must:
+- Be project-agnostic
+- Handle multiple repositories
+- Analyze full repository on first intake
+- Become diff-oriented after baseline
+
+---
+
+## 🔒 Non-Negotiables
+
+- No destructive git operations
+- No forced architecture override
+- No automatic main push
+- Full regression validation required
+- Full functional validation required
+
+---
+
+Version: V4.2
+Status: Clean Supervisor Baseline
