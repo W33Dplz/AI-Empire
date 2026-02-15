@@ -1,90 +1,137 @@
-﻿# AI-EMPIRE SESSION START PROTOCOL — V4.1 META-ARCHITECT
+﻿# AI-EMPIRE V4 — SUPERVISOR MODE SESSION PROTOCOL
 
-Je travaille sur le projet AI-EMPIRE.
+------------------------------------------------------------
+GLOBAL CONTEXT
+------------------------------------------------------------
 
-AI-EMPIRE n’est PAS un générateur de code.
-C’est un META-ARCHITECTE d’IA supervisant Lovable.
+AI-EMPIRE is now a Lovable Supervision Engine.
 
----------------------------------
-MISSION PRIORITAIRE ACTUELLE
----------------------------------
+Lovable builds and pushes to branch:
+lovable-dev
 
-1. Récupérer le code généré par Lovable
-2. L’auditer structurellement
-3. L’exécuter et le tester automatiquement
-4. Corriger les erreurs détectées
-5. Optimiser la qualité du code
-6. Vérifier conformité avec vision initiale
-7. Préparer un push propre
-8. Générer un rapport produit structuré
-9. Proposer améliorations business
+AI-EMPIRE supervises lovable-dev before merge to main.
 
----------------------------------
-ARCHITECTURE ACTIVE
----------------------------------
+Main branch is protected.
+lovable-dev is volatile.
 
-- Orchestrator = state machine
-- DevAgent = exécution patch
-- TestAgent = validation technique
-- AuditAgent = sécurité métier
-- GitAgent = versioning sécurisé
-- RiskEngine = validation adaptative
-- Sandbox isolée par mission
-- Aucun accès root
-- Aucun reset destructif
+AI-EMPIRE must:
+- Analyze full repository on first intake
+- Become diff-oriented afterward
+- Detect regressions
+- Validate full functional stability
+- Attempt safe automatic fixes
+- Retest after fix
+- Generate certification report
+- Prepare clean merge to main
 
----------------------------------
-RÈGLES STRUCTURELLES NON NÉGOCIABLES
----------------------------------
+AI-EMPIRE NEVER rewrites entire architecture.
 
-1. Si un bug apparaît 2 fois → STOP → correction structurelle obligatoire.
-2. Toute mission passe par missionDefinitionEngine.
-3. Aucun patch hors sandbox.
-4. Aucun commit sans validation TestAgent PASS.
-5. Toute modification doit être traçable.
-6. queue.json doit toujours être un ARRAY.
-7. Protection BOM obligatoire.
-8. Interdiction d’utiliser -replace fragile.
-9. Toute évolution architecture → proposer Tracking Snapshot.
-10. Aucun effet silencieux autorisé.
+------------------------------------------------------------
+V3 LEGACY STATUS
+------------------------------------------------------------
 
----------------------------------
-RÈGLES INTERNES DE FONCTIONNEMENT
----------------------------------
+Reusable modules from V3:
 
-1. Minimum 5 commandes PowerShell par réponse opérationnelle.
-2. Toute implémentation doit produire un effet métier réel vérifiable.
-3. Toute mutation critique doit être testée immédiatement.
-4. Micro Test obligatoire avant passage étape suivante.
-5. Aucun enchaînement sans PASS.
-6. Si doute → décision technique autonome priorisée.
-7. Aucune dérive hors roadmap validée.
-8. Toujours privilégier modification déterministe complète plutôt que patch fragile.
-9. Toujours sécuriser avant d’optimiser.
-10. Toujours raisonner architecture avant code.
+- risk engine
+- sandbox isolation logic
+- logger
+- missionDefinitionEngine
+- git isolation
+- queue protections
+- adaptive risk escalation
+- validation layering
 
----------------------------------
-FOCUS STRATÉGIQUE ACTUEL
----------------------------------
+V3 Orchestrator archived under:
+legacy_v3
 
-BUILD THE LOVABLE SUPERVISION LAYER FIRST.
+V4 Supervisor starts clean.
 
-La génération de prompt avancée viendra après.
+------------------------------------------------------------
+ARCHITECTURAL RULES (NON-NEGOTIABLE)
+------------------------------------------------------------
 
----------------------------------
-AVANT TOUTE PROPOSITION
----------------------------------
+1. No destructive git operations.
+2. No forced main push.
+3. No global architecture rewrite.
+4. No mutation without explicit effect verification.
+5. Every critical mutation must be traceable.
+6. If same structural bug appears twice → STOP → structural fix mandatory.
+7. queue.json MUST always be an array.
+8. Loader must always protect against BOM.
+9. ES Modules only (CommonJS deprecated).
+10. No fragile -replace usage.
+11. Prefer full file rewrite over regex patch.
+12. Micro-test required after each new core brick.
+13. No commit without validation PASS.
+14. Rollback must always be possible.
+15. No root write outside sandbox.
+16. Risk-aware validation mandatory.
+17. Validation escalation LEVEL_1 / LEVEL_2 / LEVEL_3 active.
+18. Never assume JSON format.
+19. Always verify mission state transitions.
+20. Never introduce architectural drift.
 
-- Lire le MANIFEST complet
-- Lire le dernier Tracking Snapshot
-- Vérifier état pipeline
-- Vérifier état mission engine
-- Vérifier isolation sandbox
+------------------------------------------------------------
+CHATGPT INTERACTION RULES (MANDATORY)
+------------------------------------------------------------
 
----------------------------------
-PHASE ACTUELLE
----------------------------------
+1. Never end a message without a clear next action.
+2. Always provide concrete executable PowerShell commands.
+3. Always group a minimum of 5 executable commands.
+4. No theoretical-only responses.
+5. No speculative refactors.
+6. No architectural drift.
+7. If a problem appears twice → STOP → structural correction.
+8. Always assume multi-project supervision.
+9. Always think impact analysis first.
+10. Protect historical stability at all costs.
 
-Lovable Code Supervision Engine — Phase 1
-(Audit / Test / Correction / Certification)
+Every response MUST end with actionable PowerShell steps.
 
+------------------------------------------------------------
+OPERATIONAL FLOW
+------------------------------------------------------------
+
+Lovable → lovable-dev
+↓
+Intake
+↓
+Audit
+↓
+Test
+↓
+Fix
+↓
+Re-test
+↓
+Optimize
+↓
+Certify
+↓
+Manual merge to main
+
+------------------------------------------------------------
+MULTI-PROJECT TARGET
+------------------------------------------------------------
+
+AI-EMPIRE must be project-agnostic.
+
+First push of a project:
+Full structural baseline analysis.
+
+Subsequent pushes:
+Diff-based mission-oriented supervision.
+
+------------------------------------------------------------
+SESSION CONTINUATION INSTRUCTIONS
+------------------------------------------------------------
+
+When opening a new chat:
+
+1. Paste this entire file.
+2. State current phase (e.g., "Building Intake Engine").
+3. Assume V4 Supervisor mode.
+4. Assume legacy_v3 is frozen.
+5. Assume reusable core modules remain available.
+
+Version: V4.3 SUPERVISOR HARD MODE
