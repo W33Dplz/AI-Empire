@@ -6,6 +6,7 @@ import { runTests } from "./test/testEngine.mjs";
 import { runFixEngine } from "./fix/fixEngine.mjs";
 import { runRegressionGuardV2 } from "./regression/regressionGuardV2.mjs";
 import { runArchitecturalScoreEngine } from "./scoring/architecturalScoreEngine.mjs";
+import { runBaselineEngine } from "./baseline/baselineEngine.mjs";
 
 export async function runSupervisor(repoPath) {
 
@@ -56,6 +57,10 @@ export async function runSupervisor(repoPath) {
         test
     );
 
+    const baseline = await runBaselineEngine(
+        architecturalScore.architecturalScore
+    );
+
     let overallStatus = "READY";
     let requiresHumanReview = false;
 
@@ -67,12 +72,20 @@ export async function runSupervisor(repoPath) {
         requiresHumanReview = true;
     }
 
+    if (baseline.aggravationDetected) {
+        requiresHumanReview = true;
+        if (architecturalScore.architecturalScore <= 60) {
+            overallStatus = "BLOCKED";
+        }
+    }
+
     return {
         intake,
         trace,
         architecturalImpact,
         regressionGuard,
         architecturalScore,
+        baseline,
         audit,
         test,
         fix,
