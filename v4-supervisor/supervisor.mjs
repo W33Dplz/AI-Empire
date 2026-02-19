@@ -8,6 +8,8 @@ import { runRegressionGuardV2 } from "./regression/regressionGuardV2.mjs";
 import { runArchitecturalScoreEngine } from "./scoring/architecturalScoreEngine.mjs";
 import { runBaselineEngine } from "./baseline/baselineEngine.mjs";
 import { runIntentClassifier } from "./intent/intentClassifier.mjs";
+import { runCommitIntentExtractor } from "./intent/commitIntentExtractor.mjs";
+import { runScopeDriftDetector } from "./intent/scopeDriftDetector.mjs";
 import { runDecisionEngine } from "./decision/decisionEngine.mjs";
 
 export async function runSupervisor(repoPath) {
@@ -69,11 +71,20 @@ export async function runSupervisor(repoPath) {
         regressionGuard
     );
 
+    const commitIntent = await runCommitIntentExtractor(repoPath);
+
+    const scopeDrift = runScopeDriftDetector(
+        commitIntent,
+        architecturalImpact,
+        regressionGuard
+    );
+
     const decision = runDecisionEngine(
         architecturalScore,
         regressionGuard,
         intent,
-        baseline
+        baseline,
+        scopeDrift
     );
 
     return {
@@ -84,6 +95,8 @@ export async function runSupervisor(repoPath) {
         architecturalScore,
         baseline,
         intent,
+        commitIntent,
+        scopeDrift,
         audit,
         test,
         fix,
