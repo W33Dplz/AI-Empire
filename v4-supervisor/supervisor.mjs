@@ -10,6 +10,7 @@ import { runBaselineEngine } from "./baseline/baselineEngine.mjs";
 import { runIntentClassifier } from "./intent/intentClassifier.mjs";
 import { runCommitIntentExtractor } from "./intent/commitIntentExtractor.mjs";
 import { runScopeDriftDetector } from "./intent/scopeDriftDetector.mjs";
+import { runFeatureClaimRegistry } from "./registry/featureClaimRegistry.mjs";
 import { runDecisionEngine } from "./decision/decisionEngine.mjs";
 
 export async function runSupervisor(repoPath) {
@@ -26,7 +27,6 @@ export async function runSupervisor(repoPath) {
 
     const trace = runFeatureTrace(intake.diffSummary);
     const architecturalImpact = buildImpactGraphV2(intake.diffSummary);
-
     const audit = await runAudit(repoPath, intake.diffSummary);
 
     let test = {
@@ -79,12 +79,19 @@ export async function runSupervisor(repoPath) {
         regressionGuard
     );
 
+    const featureRegistry = await runFeatureClaimRegistry(
+        repoPath,
+        intake.diffSummary,
+        architecturalImpact
+    );
+
     const decision = runDecisionEngine(
         architecturalScore,
         regressionGuard,
         intent,
         baseline,
-        scopeDrift
+        scopeDrift,
+        featureRegistry
     );
 
     return {
@@ -97,6 +104,7 @@ export async function runSupervisor(repoPath) {
         intent,
         commitIntent,
         scopeDrift,
+        featureRegistry,
         audit,
         test,
         fix,

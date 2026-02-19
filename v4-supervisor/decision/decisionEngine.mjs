@@ -3,7 +3,8 @@
     regressionGuard,
     intent,
     baseline,
-    scopeDrift
+    scopeDrift,
+    featureRegistry
 ) {
 
     let overallStatus = "READY";
@@ -24,12 +25,20 @@
         blockingReasons.push("Scope drift detected");
     }
 
+    if (featureRegistry && featureRegistry.registryBlockingIssues.length > 0) {
+        blockingReasons.push(...featureRegistry.registryBlockingIssues);
+    }
+
     if (intent.suspiciousPattern) {
         warningReasons.push("Suspicious change pattern detected");
     }
 
     if (intent.scopeConsistency === "LOW") {
         warningReasons.push("Low scope consistency");
+    }
+
+    if (featureRegistry && featureRegistry.registryWarnings.length > 0) {
+        warningReasons.push(...featureRegistry.registryWarnings);
     }
 
     if (blockingReasons.length > 0) {
