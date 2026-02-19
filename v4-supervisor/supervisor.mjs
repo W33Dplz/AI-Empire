@@ -54,11 +54,18 @@ export async function runSupervisor(repoPath) {
         test
     );
 
+    const featureRegistry = await runFeatureClaimRegistry(
+        repoPath,
+        intake.diffSummary,
+        architecturalImpact
+    );
+
     const architecturalScore = runArchitecturalScoreEngine(
         architecturalImpact,
         regressionGuard,
         audit,
-        test
+        test,
+        featureRegistry
     );
 
     const baseline = await runBaselineEngine(
@@ -77,12 +84,6 @@ export async function runSupervisor(repoPath) {
         commitIntent,
         architecturalImpact,
         regressionGuard
-    );
-
-    const featureRegistry = await runFeatureClaimRegistry(
-        repoPath,
-        intake.diffSummary,
-        architecturalImpact
     );
 
     const decision = runDecisionEngine(

@@ -1,83 +1,54 @@
-﻿export function runArchitecturalScoreEngine(architecturalImpact, regressionGuard, auditResult, testResult) {
+﻿export function runArchitecturalScoreEngine(
+    architecturalImpact,
+    regressionGuard,
+    audit,
+    test,
+    featureRegistry
+) {
 
-    if (!architecturalImpact || !regressionGuard || !auditResult || !testResult) {
-        throw new Error("All inputs required for ArchitecturalScoreEngine");
-    }
+    let structuralScore =
+        architecturalImpact.architecturalRiskLevel === "HIGH" ? 30 :
+        architecturalImpact.architecturalRiskLevel === "MEDIUM" ? 20 :
+        10;
 
-    let penalties = 0;
-    const breakdown = {};
+    let propagationScore =
+        regressionGuard.regressionGuardLevel === "CRITICAL" ? 25 :
+        regressionGuard.regressionGuardLevel === "HIGH" ? 20 :
+        regressionGuard.regressionGuardLevel === "MEDIUM" ? 15 :
+        10;
 
-    // 1. Structural impact
-    if (architecturalImpact.impactType === "STRUCTURAL") {
-        if (architecturalImpact.scope === "GLOBAL") {
-            penalties += 30;
-            breakdown.structural = 30;
-        } else {
-            penalties += 20;
-            breakdown.structural = 20;
+    let regressionScore =
+        (!audit.auditPassed || !test.testPassed) ? 25 : 10;
+
+    let totalScore = 100 - (structuralScore + propagationScore + regressionScore);
+
+    if (featureRegistry) {
+
+        if (featureRegistry.mismatchSeverity === "MAJOR") {
+            totalScore = Math.min(totalScore, 30);
         }
-    } else if (architecturalImpact.impactType === "BEHAVIORAL") {
-        penalties += 10;
-        breakdown.structural = 10;
-    } else {
-        penalties += 5;
-        breakdown.structural = 5;
+
+        if (featureRegistry.mismatchSeverity === "MINOR") {
+            totalScore = totalScore - 10;
+        }
+
+        if (featureRegistry.registryConfidenceImpact === "INVALIDATE") {
+            totalScore = Math.min(totalScore, 20);
+        }
     }
 
-    // 2. Propagation
-    const surface = architecturalImpact.propagationSurfaceScore;
-
-    if (surface >= 8) {
-        penalties += 25;
-        breakdown.propagation = 25;
-    } else if (surface >= 5) {
-        penalties += 15;
-        breakdown.propagation = 15;
-    } else if (surface >= 3) {
-        penalties += 8;
-        breakdown.propagation = 8;
-    } else {
-        penalties += 3;
-        breakdown.propagation = 3;
-    }
-
-    // 3. Regression guard
-    if (regressionGuard.regressionGuardLevel === "CRITICAL") {
-        penalties += 25;
-        breakdown.regression = 25;
-    } else if (regressionGuard.regressionGuardLevel === "HIGH") {
-        penalties += 15;
-        breakdown.regression = 15;
-    } else {
-        penalties += 8;
-        breakdown.regression = 8;
-    }
-
-    // 4. Audit
-    if (!auditResult.auditPassed) {
-        penalties += 10;
-        breakdown.audit = 10;
-    }
-
-    // 5. Test
-    if (!testResult.testPassed) {
-        penalties += 10;
-        breakdown.test = 10;
-    }
-
-    const architecturalScore = Math.max(0, 100 - penalties);
-
-    let decisionHint = "SAFE";
-
-    if (architecturalScore <= 30) {
-        decisionHint = "DANGEROUS";
-    } else if (architecturalScore <= 60) {
-        decisionHint = "REVIEW_REQUIRED";
-    }
+    let decisionHint =
+        totalScore <= 30 ? "DANGEROUS" :
+        totalScore <= 60 ? "REVIEW_REQUIRED" :
+        "SAFE";
 
     return {
-        architecturalScore,
-        scoreBreakdown: breakdown,
+        architecturalScore: totalScore,
+        scoreBreakdown: {
+            structural: structuralScore,
+            propagation: propagationScore,
+            regression: regressionScore
+        },
         decisionHint
     };
 }
