@@ -1,48 +1,121 @@
-﻿export function runRegressionGuardV2(architecturalImpact, diffSummary, auditResult, testResult) {
+﻿export function runRegressionGuardV2(
+    architecturalImpact,
+    diffSummary,
+    audit,
+    test,
+    architecturalScore
+) {
 
-    if (!architecturalImpact || !diffSummary || !auditResult || !testResult) {
-        throw new Error("All inputs required for Regression Guard V2");
+    const added = diffSummary.added || [];
+    const modified = diffSummary.modified || [];
+
+    let dependencyRisk = "NONE";
+    let propagationRisk = "NONE";
+    let configRisk = "NONE";
+    let nonRuntimeRisk = "NONE";
+
+    // -------------------------
+    // AXE 1 – Dependency Risk
+    // -------------------------
+
+    const packageModified = modified.includes("package.json");
+    const lockModified = modified.includes("package-lock.json");
+
+    if (packageModified && !lockModified) {
+        dependencyRisk = "MEDIUM";
     }
 
-    const impacted = architecturalImpact.impactedLayers || {};
-
-    let regressionScope = "LOCAL";
-    let propagationRisk = "LOW";
-    let validationCoverageRisk = "LOW";
-    let manualVerificationZones = [];
-
-    if (architecturalImpact.impactType === "STRUCTURAL" &&
-        architecturalImpact.scope === "GLOBAL") {
-        regressionScope = "GLOBAL";
+    if (packageModified && lockModified) {
+        dependencyRisk = "MEDIUM";
     }
 
-    if ((impacted.dependencies && impacted.dependencies.length > 0) ||
-        architecturalImpact.propagationSurfaceScore >= 8) {
+    if (!packageModified && lockModified) {
+        dependencyRisk = "LOW";
+    }
+
+    // -------------------------
+    // AXE 2 – Propagation Risk
+    // -------------------------
+
+    if (
+        architecturalImpact.scope === "GLOBAL" &&
+        architecturalImpact.impactType === "STRUCTURAL"
+    ) {
         propagationRisk = "HIGH";
-        manualVerificationZones.push("dependencies");
-        manualVerificationZones.push("bootstrap");
-        manualVerificationZones.push("runtime");
+    }
+    else if (architecturalImpact.impactType === "STRUCTURAL") {
+        propagationRisk = "MEDIUM";
+    }
+    else if (architecturalImpact.scope === "LOCAL") {
+        propagationRisk = "LOW";
     }
 
-    if (!testResult.testPassed) {
-        validationCoverageRisk = "HIGH";
-    } else if (architecturalImpact.architecturalRiskLevel === "HIGH") {
-        validationCoverageRisk = "HIGH";
+    // -------------------------
+    // AXE 3 – Config Risk
+    // -------------------------
+
+    const configFiles = [...added, ...modified].filter(f =>
+        f.toLowerCase().includes("config") ||
+        f.toLowerCase().includes(".env")
+    );
+
+    if (configFiles.length > 0) {
+        configRisk = "LOW";
     }
 
-    let regressionGuardLevel = "MODERATE";
+    // -------------------------
+    // AXE 4 – Non-runtime Risk
+    // -------------------------
 
-    if (architecturalImpact.propagationSurfaceScore >= 8) {
+    const runtimeFiles = [...added, ...modified].filter(f =>
+        f.endsWith(".js") || f.endsWith(".ts") || f.endsWith(".mjs")
+    );
+
+    if (runtimeFiles.length === 0) {
+        nonRuntimeRisk = "NONE";
+    }
+
+    // -------------------------
+    // AGRÉGATION
+    // -------------------------
+
+    let regressionGuardLevel = "LOW";
+
+    const highCount = [
+        dependencyRisk,
+        propagationRisk,
+        configRisk
+    ].filter(r => r === "HIGH").length;
+
+    const mediumCount = [
+        dependencyRisk,
+        propagationRisk,
+        configRisk
+    ].filter(r => r === "MEDIUM").length;
+
+    if (
+        propagationRisk === "HIGH" &&
+        dependencyRisk === "HIGH" &&
+        architecturalScore &&
+        architecturalScore.architecturalScore <= 30
+    ) {
         regressionGuardLevel = "CRITICAL";
-    } else if (architecturalImpact.propagationSurfaceScore >= 5) {
+    }
+    else if (propagationRisk === "HIGH" || dependencyRisk === "HIGH") {
         regressionGuardLevel = "HIGH";
+    }
+    else if (mediumCount >= 2) {
+        regressionGuardLevel = "HIGH";
+    }
+    else if (mediumCount === 1) {
+        regressionGuardLevel = "MEDIUM";
     }
 
     return {
-        regressionScope,
+        dependencyRisk,
         propagationRisk,
-        validationCoverageRisk,
-        regressionGuardLevel,
-        manualVerificationZones
+        configRisk,
+        nonRuntimeRisk,
+        regressionGuardLevel
     };
 }
