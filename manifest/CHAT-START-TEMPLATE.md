@@ -1,137 +1,121 @@
-﻿# AI-EMPIRE V4 — SUPERVISOR MODE SESSION PROTOCOL
+﻿# AI-EMPIRE V4.1 — ORCHESTRATION SUPERVISOR PROTOCOL
 
 ------------------------------------------------------------
-GLOBAL CONTEXT
+GLOBAL POSITIONING
 ------------------------------------------------------------
 
-AI-EMPIRE is now a Lovable Supervision Engine.
+AI-EMPIRE is a deterministic AI Governance and Orchestration System.
 
-Lovable builds and pushes to branch:
-lovable-dev
+It supervises AI-generated code (Lovable, Claude Code, others).
 
-AI-EMPIRE supervises lovable-dev before merge to main.
+It does NOT generate blindly.
+It validates, orchestrates, and replaces safely.
 
-Main branch is protected.
-lovable-dev is volatile.
+Target Pipeline:
 
-AI-EMPIRE must:
-- Analyze full repository on first intake
-- Become diff-oriented afterward
-- Detect regressions
-- Validate full functional stability
-- Attempt safe automatic fixes
-- Retest after fix
-- Generate certification report
-- Prepare clean merge to main
-
-AI-EMPIRE NEVER rewrites entire architecture.
+Prompt → Structured Spec → Code Generation → Structural Validation → Functional Validation → Controlled Regeneration → Certification
 
 ------------------------------------------------------------
-V3 LEGACY STATUS
+CURRENT STATE — V4.0 GOVERNANCE STABLE
 ------------------------------------------------------------
 
-Reusable modules from V3:
+Stable Layer (Completed):
 
-- risk engine
-- sandbox isolation logic
-- logger
-- missionDefinitionEngine
-- git isolation
-- queue protections
-- adaptive risk escalation
-- validation layering
+- RegressionGuard V2
+- ScopeDrift V2
+- ValidationCoverage
+- FeatureVerification V1
+- Multi-Dimensional DecisionEngine
+- CertificationEngine V1
+- CLI operational
 
-V3 Orchestrator archived under:
-legacy_v3
-
-V4 Supervisor starts clean.
-
-------------------------------------------------------------
-ARCHITECTURAL RULES (NON-NEGOTIABLE)
-------------------------------------------------------------
-
-1. No destructive git operations.
-2. No forced main push.
-3. No global architecture rewrite.
-4. No mutation without explicit effect verification.
-5. Every critical mutation must be traceable.
-6. If same structural bug appears twice → STOP → structural fix mandatory.
-7. queue.json MUST always be an array.
-8. Loader must always protect against BOM.
-9. ES Modules only (CommonJS deprecated).
-10. No fragile -replace usage.
-11. Prefer full file rewrite over regex patch.
-12. Micro-test required after each new core brick.
-13. No commit without validation PASS.
-14. Rollback must always be possible.
-15. No root write outside sandbox.
-16. Risk-aware validation mandatory.
-17. Validation escalation LEVEL_1 / LEVEL_2 / LEVEL_3 active.
-18. Never assume JSON format.
-19. Always verify mission state transitions.
-20. Never introduce architectural drift.
+This layer is deterministic.
+No mutation.
+No architectural rewrite.
+No destructive git operations.
 
 ------------------------------------------------------------
-CHATGPT INTERACTION RULES (MANDATORY)
+PHASE 2 — ORCHESTRATION INITIATION
 ------------------------------------------------------------
 
-1. Never end a message without a clear next action.
-2. Always provide concrete executable PowerShell commands.
-3. Always group a minimum of 5 executable commands.
-4. No theoretical-only responses.
-5. No speculative refactors.
-6. No architectural drift.
-7. If a problem appears twice → STOP → structural correction.
-8. Always assume multi-project supervision.
-9. Always think impact analysis first.
-10. Protect historical stability at all costs.
+Next Evolution:
 
-Every response MUST end with actionable PowerShell steps.
+1. Structured Feature Spec Schema (deterministic contract)
+2. Intent Formalization Engine (Prompt → Spec)
+3. Functional Validation Engine (Spec → Behavioral Tests)
+4. Controlled Regeneration Engine (if mismatch)
+5. Orchestrated Replace Loop
+
+AI-EMPIRE remains the deterministic orchestrator.
+
+Claude may assist in:
+- Spec drafting
+- Test generation
+- Alternative implementation proposal
+
+All decisions must remain machine-verifiable and deterministic.
 
 ------------------------------------------------------------
-OPERATIONAL FLOW
+ARCHITECTURAL INVARIANTS (NON-NEGOTIABLE)
 ------------------------------------------------------------
 
-Lovable → lovable-dev
+1. Deterministic engines only.
+2. No destructive git operations.
+3. No blind rewriting.
+4. CRITICAL must remain rare and justified.
+5. No single engine blocks alone.
+6. Validation > Declaration > Decision.
+7. Every mutation must be verifiable.
+8. No architectural drift.
+9. Spec must be machine-verifiable.
+10. No AI interpretation without measurable validation.
+
+------------------------------------------------------------
+DECISION HIERARCHY
+------------------------------------------------------------
+
+Structural Stability
 ↓
-Intake
+Risk & Drift
 ↓
-Audit
+Coverage
 ↓
-Test
+Verification
 ↓
-Fix
+Functional Validation
 ↓
-Re-test
-↓
-Optimize
-↓
-Certify
-↓
-Manual merge to main
+Certification
+
+No skipping layers.
 
 ------------------------------------------------------------
-MULTI-PROJECT TARGET
+CONTROLLED REGENERATION PRINCIPLE
 ------------------------------------------------------------
 
-AI-EMPIRE must be project-agnostic.
+If mismatch detected:
 
-First push of a project:
-Full structural baseline analysis.
+1. Isolate feature boundary.
+2. Generate alternative implementation.
+3. Re-run structural validation.
+4. Re-run functional validation.
+5. Replace only if improved.
+6. Re-certify.
 
-Subsequent pushes:
-Diff-based mission-oriented supervision.
+Never rewrite full project.
+Never auto-reset.
+Never push to main automatically.
 
 ------------------------------------------------------------
-SESSION CONTINUATION INSTRUCTIONS
+SESSION CONTINUATION
 ------------------------------------------------------------
 
-When opening a new chat:
+When starting a new session:
 
-1. Paste this entire file.
-2. State current phase (e.g., "Building Intake Engine").
-3. Assume V4 Supervisor mode.
-4. Assume legacy_v3 is frozen.
-5. Assume reusable core modules remain available.
+1. Paste this protocol.
+2. State current phase.
+3. Specify target layer (Governance / Intent / Validation / Regeneration).
+4. Assume V4 Governance Stable.
+5. Assume previous layers are frozen.
 
-Version: V4.3 SUPERVISOR HARD MODE
+Version:
+AI-EMPIRE V4.1 — Orchestration Initiated
