@@ -9,6 +9,7 @@ import { log } from "../core/logger.js";
 import { TestAgent } from "../agents/testAgent.js";
 import { AuditAgent } from "../agents/auditAgent.js";
 import { calculateRisk } from "../core/riskEngine.js";
+import { getMissionsRoot } from "../lib/paths.js";
 
 class Brain {
 
@@ -19,7 +20,7 @@ class Brain {
 
   loadPendingMissions() {
 
-    const missionsRoot = "C:/AI-EMPIRE-MISSIONS";
+    const missionsRoot = getMissionsRoot();
     if (!fs.existsSync(missionsRoot)) return;
 
     const missionDirs = fs.readdirSync(missionsRoot);

@@ -1,0 +1,24 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes: { label: What happened?, description: Describe the bug }
+    validations: { required: true }
+  - type: textarea
+    id: reproduce
+    attributes: { label: Steps to reproduce, render: shell }
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes: { label: ai-empire version, placeholder: "0.2.0-mvp" }
+    validations: { required: true }
+  - type: dropdown
+    id: os
+    attributes: { label: OS, options: [Linux, macOS, Windows] }
+    validations: { required: true }
+  - type: input
+    id: node
+    attributes: { label: Node version }
+    validations: { required: true }

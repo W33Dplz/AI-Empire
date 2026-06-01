@@ -1,5 +1,6 @@
 import path from "path";
 import simpleGit from "simple-git";
+import { getMissionsRoot } from "../lib/paths.js";
 
 const FORBIDDEN_PATHS = [
   "orchestrator",
@@ -44,7 +45,7 @@ export class AuditAgent {
   #checkSandboxIsolation(report) {
     const normalized = path.resolve(this.sandboxPath);
 
-    const expectedRoot = path.resolve("C:/AI-EMPIRE-MISSIONS");
+    const expectedRoot = path.resolve(getMissionsRoot());
 
     if (!normalized.startsWith(expectedRoot)) {
       throw new Error("Sandbox path not inside AI-EMPIRE-MISSIONS root");

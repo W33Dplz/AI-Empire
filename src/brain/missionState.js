@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { log } from "../core/logger.js";
+import { getMissionsRoot } from "../lib/paths.js";
 
-const MISSIONS_ROOT = path.resolve("C:/AI-EMPIRE-MISSIONS");
+const MISSIONS_ROOT = getMissionsRoot();
 
 const STATES = Object.freeze([
   "CREATED",

@@ -1,0 +1,25 @@
+name: AI-EMPIRE self-test
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  self-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Supervise demo-pass fixture
+        run: node bin/ai-empire supervise --repo tests/fixtures/demo-pass --branch main --dry-run
+      - name: Supervise demo-reject fixture (must exit 2)
+        run: |
+          set +e
+          node bin/ai-empire supervise --repo tests/fixtures/demo-reject --branch main --dry-run
+          code=$?
+          if [ "$code" != "2" ]; then echo "Expected exit 2, got $code"; exit 1; fi
+          echo "demo-reject correctly exited 2"

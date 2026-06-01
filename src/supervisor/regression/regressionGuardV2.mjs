@@ -81,7 +81,7 @@
 
     let regressionGuardLevel = "LOW";
 
-    const highCount = [
+    const _highCount = [
         dependencyRisk,
         propagationRisk,
         configRisk

@@ -1,0 +1,63 @@
+name: "AI-EMPIRE supervise"
+description: "Run AI-EMPIRE on a target repo and post the verdict as a PR comment."
+inputs:
+  repo:
+    description: "Path to the target git repository (defaults to checkout root)"
+    required: false
+    default: "."
+  branch:
+    description: "Branch to supervise"
+    required: true
+  openai-key:
+    description: "OpenAI API key (set as secret)"
+    required: false
+  report-path:
+    description: "Where to write the markdown report"
+    required: false
+    default: "./ai-empire-report.md"
+  dry-run:
+    description: "Skip LLM calls"
+    required: false
+    default: "false"
+outputs:
+  verdict:
+    description: "PASS | FIX | REJECT"
+    value: ${{ steps.run.outputs.verdict }}
+  report-artifact-path:
+    description: "Path to the generated report"
+    value: ${{ steps.run.outputs.report-path }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+    - name: Install ai-empire
+      shell: bash
+      run: npm i -g ai-empire@latest
+    - id: run
+      name: Supervise
+      shell: bash
+      env:
+        OPENAI_API_KEY: ${{ inputs.openai-key }}
+      run: |
+        set +e
+        DRY=""
+        if [ "${{ inputs.dry-run }}" = "true" ]; then DRY="--dry-run"; fi
+        ai-empire supervise --repo "${{ inputs.repo }}" --branch "${{ inputs.branch }}" --report-path "${{ inputs.report-path }}" $DRY
+        code=$?
+        case "$code" in
+          0) v="PASS" ;;
+          1) v="FIX" ;;
+          2) v="REJECT" ;;
+          *) v="ERROR" ;;
+        esac
+        echo "verdict=$v" >> "$GITHUB_OUTPUT"
+        echo "report-path=${{ inputs.report-path }}" >> "$GITHUB_OUTPUT"
+        exit $code
+    - name: Upload report artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ai-empire-report
+        path: ${{ inputs.report-path }}

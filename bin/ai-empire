@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+import { main } from "../src/cli/index.js";
+main(process.argv).catch((e) => { process.stderr.write("E_INTERNAL: " + e.message + "\n"); process.exit(99); });

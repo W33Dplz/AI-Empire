@@ -6,18 +6,18 @@
     featureRegistry
 ) {
 
-    let structuralScore =
+    const structuralScore =
         architecturalImpact.architecturalRiskLevel === "HIGH" ? 30 :
         architecturalImpact.architecturalRiskLevel === "MEDIUM" ? 20 :
         10;
 
-    let propagationScore =
+    const propagationScore =
         regressionGuard.regressionGuardLevel === "CRITICAL" ? 25 :
         regressionGuard.regressionGuardLevel === "HIGH" ? 20 :
         regressionGuard.regressionGuardLevel === "MEDIUM" ? 15 :
         10;
 
-    let regressionScore =
+    const regressionScore =
         (!audit.auditPassed || !test.testPassed) ? 25 : 10;
 
     let totalScore = 100 - (structuralScore + propagationScore + regressionScore);
@@ -37,7 +37,7 @@
         }
     }
 
-    let decisionHint =
+    const decisionHint =
         totalScore <= 30 ? "DANGEROUS" :
         totalScore <= 60 ? "REVIEW_REQUIRED" :
         "SAFE";

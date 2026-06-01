@@ -1,5 +1,5 @@
 import fs from "fs";
-import path from "path";
+import _path from "path";
 
 const REGISTRY_PATH = "./registry/missions.json";
 

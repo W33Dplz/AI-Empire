@@ -1,194 +1,124 @@
 # AI-EMPIRE
 
-Orchestrateur multi-agents pour superviser, auditer et certifier le code généré automatiquement (typiquement par [Lovable](https://lovable.dev)) avant merge sur une branche protégée.
+> Supervise AI-generated code before it lands on your protected branch.
 
-> **Statut : prototype expérimental (V4.2 baseline).** Le cœur V3 (worker + agents + sandbox) tourne. La couche V4 « Supervisor » est à l'état de squelette : architecture posée, modules de scoring/décision partiellement implémentés. Pas de tests automatisés à ce jour. Pas adapté à un usage production.
+🚧 **v0.2.0-mvp — public preview.** Local CLI works. GitHub Action arriving in v0.3.0.
 
----
-
-## Concept
-
-```
-Lovable (UI-builder)
-       │
-       ▼  push
-   lovable-dev ───────────┐
-                          │
-                          ▼
-                     AI-EMPIRE
-                          │
-                          ├─ audit structurel & diff
-                          ├─ exécution npm build / lint / test
-                          ├─ fix automatique si possible
-                          ├─ détection de régression & scope drift
-                          └─ certification
-                          │
-                          ▼  merge manuel
-                        main (protégée)
-```
-
-Le principe : `main` est sacrée, `lovable-dev` est volatile. AI-EMPIRE est le filtre qualité entre les deux.
+![CI](https://github.com/W33Dplz/AI-Empire/actions/workflows/ci.yml/badge.svg)
+![npm](https://img.shields.io/npm/v/ai-empire.svg)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ---
 
-## Stack
+## What it is
 
-- **Runtime** : Node.js ESM (`"type": "module"`)
-- **Dépendances** : `openai` (SDK v4), `simple-git`, `dotenv`
-- **OS supporté** : Windows uniquement (chemins `C:/AI-EMPIRE-MISSIONS/` hardcodés)
-- **Persistance** : `queue.json` (jobs), `memory/` (plans + missions), `sandbox/` (clones isolés)
+AI-EMPIRE is a CLI that supervises code-generation output (Lovable, Cursor, Copilot, any LLM agent) **before merge**. It runs your repo's build, lint, and tests in an isolated sandbox, classifies the commit's intent, detects scope drift, and emits a pass/fail verdict with reasons — so reviewers stop rubber-stamping diffs they didn't read.
 
 ---
 
-## Structure
-
-```
-AI-Empire/
-├── worker.js                  # entrypoint — poll queue.json toutes les 2s
-├── queue.json                 # file d'attente des missions
-├── core/                      # logger, riskEngine, sandboxManager, missionDefinition
-├── agents/                    # devAgent, gitAgent, testAgent, auditAgent
-├── legacy_v3/orchestrator/    # Brain V3 (toujours utilisé par worker.js)
-├── v4-supervisor/             # V4 Supervisor — squelette
-│   ├── intent/                # IntentClassifier, CommitIntentExtractor
-│   ├── decision/              # DecisionEngine, ScopeDriftDetector
-│   ├── scoring/               # ArchitecturalScoreEngine, FeatureClaimRegistry
-│   ├── regression/            # RegressionGuard V2
-│   ├── baseline/              # BaselineEngine (aggravation detection)
-│   └── trace/                 # FeatureTraceEngine, ImpactGraph
-├── manifest/                  # AI-EMPIRE-MANIFEST.md, V4-ROADMAP.md
-├── registry/                  # feature registry (Code Connect-like)
-├── memory/                    # missions et plans sérialisés
-├── sandbox/                   # cibles d'isolation pour les missions
-└── tests/v4/                  # vide (pas de tests automatisés)
-```
-
----
-
-## Installation
+## 30-second demo
 
 ```bash
-git clone https://github.com/W33Dplz/AI-Empire.git
-cd AI-Empire
-npm install
-cp .env.example .env   # créer .env.example d'abord — voir Sécurité
+npx ai-empire supervise --repo ./my-app --branch dev --dry-run
 ```
 
-`.env` attendu :
+Sample output (abbreviated):
 
-```env
-OPENAI_API_KEY=sk-...
 ```
-
-Créer le dossier des missions :
-
-```bash
-mkdir C:/AI-EMPIRE-MISSIONS
+[intake]   ./my-app @ dev — 7 files changed
+[intent]   feat: add Stripe checkout (confidence 0.91)
+[tests]    npm run build  PASS (12.3s)
+           npm run lint   PASS
+           npm test       PASS (24/24)
+[scope]    drift score 0.08 — within declared intent
+[verdict]  APPROVE — safe to merge
 ```
 
 ---
 
-## Utilisation
+## 5-minute quickstart
 
-### Lancer le worker
+1. **Install**
+   ```bash
+   npm i -g ai-empire
+   # or one-shot:
+   npx ai-empire --help
+   ```
 
-```bash
-node worker.js
-```
+2. **Set your key** (skip if running `--dry-run`)
+   ```bash
+   export OPENAI_API_KEY=sk-...
+   ```
 
-Le worker poll `queue.json` toutes les 2 secondes et traite les jobs `PENDING`.
+3. **Run on your repo**
+   ```bash
+   ai-empire supervise --repo . --branch feature/checkout
+   ```
 
-### Format d'un job
-
-```json
-{
-  "status": "PENDING",
-  "plan": {
-    "steps": [
-      {
-        "type": "PATCH_FILE",
-        "target": "config/app.js",
-        "content": "console.log('hello');"
-      }
-    ]
-  }
-}
-```
-
-`status` évolue : `PENDING` → `RUNNING` → `DONE` ou `FAILED`.
-
-### Flow interne d'une mission
-
-1. **DevAgent** applique les `PATCH_FILE` dans un sandbox isolé (`sandbox/mission-{id}/`)
-2. **GitAgent** crée une branche `mission-{id}` et commit
-3. **TestAgent** exécute `npm run build`, `npm run lint`, `npm run typecheck` du sandbox (timeout court)
-4. **AuditAgent** valide que le diff reste dans le scope autorisé (pas de modif hors targets)
-5. **RiskGate** scanne le contenu pour détecter patterns suspects
-6. Si tout passe → mission `READY_FOR_DECISION` → approbation auto si `approveMission`
+4. **Read the report** — JSON written to `.ai-empire/report.json`, human summary printed to stdout.
 
 ---
 
-## V4 Supervisor — état réel
+## CLI reference
 
-| Module | Implémenté | Note |
+| Command | Description | Example |
 |---|---|---|
-| IntentClassifier | ✅ | Classification déterministe du type de changement |
-| CommitIntentExtractor | ✅ | Parse l'intention à partir du commit message |
-| ScopeDriftDetector | ✅ | Compare intent vs impact architectural |
-| BaselineEngine | ✅ | Comparaison scores + détection d'aggravation |
-| RegressionGuard V2 | ✅ | Analyse propagation déterministe multi-axes |
-| ArchitecturalScoreEngine | ✅ | Scoring registry-aware |
-| FeatureClaimRegistry | ✅ | Intégré dans Supervisor + DecisionEngine |
-| DecisionEngine | ✅ | Orchestration pure, score-driven |
-| FeatureTraceEngine | ⚠️ Partial | V1 implémenté, non testé en intégration |
-| ImpactGraph V2 | ⚠️ Partial | Scope + propagation scoring posé |
-| IntakeEngine | ❌ | Stub |
-| Tests V4 | ❌ | Dossier vide |
-| Doc utilisateur V4 | ❌ | Manifeste stratégique uniquement |
+| `supervise` | Run the full pipeline on a repo + branch | `ai-empire supervise --repo . --branch dev` |
+| `doctor` | Check environment (Node version, git, API key, sandbox dir) | `ai-empire doctor` |
+| `version` | Print CLI version and build info | `ai-empire version` |
+
+Full flag reference: [`docs/cli.md`](docs/cli.md) (generated from [`specs/001-public-release-v1/contracts/cli.md`](specs/001-public-release-v1/contracts/cli.md)).
 
 ---
 
-## Sécurité — points d'attention
+## GitHub Action
 
-> ⚠️ **Lis cette section avant de cloner ou rendre le repo public.**
-
-1. **Ne commit jamais `.env`.** Le `.gitignore` actuel ne le couvre pas. Ajouter :
-   ```
-   .env
-   .env.local
-   node_modules/
-   logs/
-   memory/*.json
-   sandbox/
-   ```
-2. **Si une clé API a déjà été committée**, la révoquer immédiatement (OpenAI dashboard) AVANT de nettoyer l'historique avec `git filter-repo` ou BFG.
-3. **`worker.js` exécute du code arbitraire** issu de `queue.json` via `npm run` dans un sandbox fs-isolé. L'isolation protège l'hôte du write fs, mais **n'isole pas l'exécution du code Node** lui-même. Ne jamais lancer le worker avec une queue non auditée.
-4. **`RiskGate` est superficiel** : détecte des patterns texte ("ignore previous instructions", "eval"), pas les vrais vecteurs (script `npm run` malveillant, dépendances exotiques dans le sandbox).
-5. Chemins hardcodés Windows (`C:/AI-EMPIRE-MISSIONS/`) — révèlent l'OS de dev et empêchent toute portabilité Linux/macOS.
+v0.3.0 ships a composite action — see [`docs/github-action.md`](docs/github-action.md) (work in progress).
 
 ---
 
-## Roadmap
+## Architecture in 30 seconds
 
-Voir `manifest/V4-ROADMAP.md`.
+```
+intake → diff → intent → tests → decision → verdict
+```
 
-Priorités identifiées :
-- [ ] Compléter `IntakeEngine` (entrée d'un repo cible)
-- [ ] Tests d'intégration V4 (dossier `tests/v4/`)
-- [ ] README d'usage côté utilisateur Lovable
-- [ ] Portabilité Linux/macOS (chemins via `path.join`, env var pour `MISSIONS_ROOT`)
-- [ ] `.env.example` au lieu d'un `.env` tracké
-- [ ] Tests unitaires sur `riskGate`, `auditAgent`, `sandboxManager`
-- [ ] Documenter le contrat d'un `plan` (schema JSON)
+- **intake** — clone target repo into isolated sandbox
+- **diff** — extract changed files vs base branch
+- **intent** — classify what the commit claims to do (LLM-assisted)
+- **tests** — run `build` / `lint` / `test` in sandbox
+- **decision** — compare claimed intent vs actual impact, score scope drift
+- **verdict** — APPROVE / REJECT / REVIEW with structured reasons
 
----
-
-## Licence
-
-À définir par l'auteur.
+Deep dive: [`docs/architecture.md`](docs/architecture.md).
 
 ---
 
-## Auteur
+## FAQ
 
-Repo privé, créé 2026-03-03. Commits sous identité technique `Empire AI <empire@local.dev>`.
+**Does it modify my code?**
+No. AI-EMPIRE clones your repo into a sandbox directory and operates there. Your working tree is untouched.
+
+**Which LLMs does it support?**
+OpenAI (`gpt-4o-mini` by default) in v1. Anthropic and local-model adapters are on the v0.4.0 roadmap.
+
+**How much does a run cost?**
+~$0.05 per run with `gpt-4o-mini` on a typical 10-file diff. Use `--dry-run` for $0.
+
+**Does it work on Windows?**
+Yes. Tested in CI matrix (Ubuntu, macOS, Windows).
+
+**Can I write a custom adapter for my LLM or CI?**
+Yes — see [`docs/adapters.md`](docs/adapters.md).
+
+---
+
+## Contributing
+
+PRs welcome. Start with [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+---
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).

@@ -1,100 +1,66 @@
-import fs from "fs";
-import path from "path";
-import { log } from "./logger.js";
+import fs from "node:fs";
+import path from "node:path";
+import { getMissionsRoot, assertInsideSandbox } from "../lib/paths.js";
 
-const MISSIONS_ROOT = path.resolve("C:/AI-EMPIRE-MISSIONS");
+const EXCLUDED_FOLDERS = ["missions", "node_modules", "legacy", "logs", ".git"];
 
-const EXCLUDED_FOLDERS = [
-  "missions",
-  "node_modules",
-  "legacy",
-  "logs",
-  ".git"
-];
-
-class SandboxManager {
-  constructor(missionId) {
-    if (!missionId) {
-      throw new Error("Mission ID is required");
-    }
-
+export default class SandboxManager {
+  constructor(missionId, opts = {}) {
+    if (!missionId) throw new Error("Mission ID is required");
     this.missionId = missionId;
-    this.missionPath = path.join(MISSIONS_ROOT, missionId);
+    this.missionsRoot = opts.missionsRoot ? path.resolve(opts.missionsRoot) : getMissionsRoot();
+    this.missionPath = path.join(this.missionsRoot, missionId);
     this.sandboxPath = path.join(this.missionPath, "sandbox");
-
+    this.markerPath = path.join(this.missionPath, ".ai-empire-mission.json");
     this._ensureDirectories();
   }
 
   _ensureDirectories() {
-    if (!fs.existsSync(MISSIONS_ROOT)) {
-      fs.mkdirSync(MISSIONS_ROOT, { recursive: true });
+    fs.mkdirSync(this.missionsRoot, { recursive: true });
+    fs.mkdirSync(this.missionPath, { recursive: true });
+    if (fs.existsSync(this.sandboxPath) && fs.existsSync(this.markerPath)) {
+      const err = new Error("E_SANDBOX_BUSY: mission " + this.missionId + " already has a sandbox");
+      err.code = "E_SANDBOX_BUSY";
+      throw err;
     }
-
-    if (!fs.existsSync(this.missionPath)) {
-      fs.mkdirSync(this.missionPath, { recursive: true });
-    }
-
     if (fs.existsSync(this.sandboxPath)) {
       fs.rmSync(this.sandboxPath, { recursive: true, force: true });
     }
-
     fs.mkdirSync(this.sandboxPath, { recursive: true });
-    log("Sandbox created for mission " + this.missionId);
+    fs.writeFileSync(this.markerPath, JSON.stringify({ missionId: this.missionId }));
   }
 
   cloneProject(projectPath) {
-    const resolvedProjectPath = path.resolve(projectPath);
-
-    if (!fs.existsSync(resolvedProjectPath)) {
-      throw new Error("Project path does not exist");
-    }
-
-    this._copyRecursive(resolvedProjectPath, this.sandboxPath);
-
-    log("Project safely cloned into sandbox for mission " + this.missionId);
+    const resolved = path.resolve(projectPath);
+    if (!fs.existsSync(resolved)) throw new Error("Project path does not exist");
+    this._copyRecursive(resolved, this.sandboxPath);
   }
 
   resolveSafePath(relativePath) {
-    const fullPath = path.resolve(this.sandboxPath, relativePath);
-
-    if (!fullPath.startsWith(this.sandboxPath)) {
-      throw new Error("Attempt to access outside sandbox");
-    }
-
-    return fullPath;
+    const candidate = path.resolve(this.sandboxPath, relativePath);
+    assertInsideSandbox(this.sandboxPath, candidate);
+    return candidate;
   }
 
-  getSandboxPath() {
-    return this.sandboxPath;
+  getSandboxPath() { return this.sandboxPath; }
+
+  cleanup() {
+    if (fs.existsSync(this.missionPath)) {
+      fs.rmSync(this.missionPath, { recursive: true, force: true });
+    }
   }
 
   _copyRecursive(src, dest) {
     const stats = fs.statSync(src);
     const baseName = path.basename(src);
-
-    if (EXCLUDED_FOLDERS.includes(baseName)) {
-      return;
-    }
-
+    if (EXCLUDED_FOLDERS.includes(baseName)) return;
     if (stats.isDirectory()) {
-      if (!fs.existsSync(dest)) {
-        fs.mkdirSync(dest, { recursive: true });
-      }
-
-      const entries = fs.readdirSync(src);
-
-      for (const entry of entries) {
-        const srcPath = path.join(src, entry);
-        const destPath = path.join(dest, entry);
-
-        this._copyRecursive(srcPath, destPath);
+      if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+      for (const entry of fs.readdirSync(src)) {
+        this._copyRecursive(path.join(src, entry), path.join(dest, entry));
       }
     } else {
       fs.copyFileSync(src, dest);
     }
   }
 }
-
-export default SandboxManager;
-
-

@@ -1,6 +1,6 @@
 {
   "name": "ai-empire",
-  "version": "0.1.0",
+  "version": "0.2.0-mvp",
   "description": "Code-supervision engine that audits, tests, fixes and certifies repository changes (from Lovable, Codex, or any code-generation pipeline) before merge to a protected branch.",
   "type": "module",
   "license": "MIT",
@@ -61,7 +61,7 @@
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
     "openai": "^4.65.0",
-    "pino": "^9.5.0",
+    "pino": "^9.14.0",
     "simple-git": "^3.30.0",
     "zod": "^3.23.8"
   },
