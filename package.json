@@ -1,10 +1,76 @@
 {
   "name": "ai-empire",
-  "version": "2.0.0",
+  "version": "0.1.0",
+  "description": "Code-supervision engine that audits, tests, fixes and certifies repository changes (from Lovable, Codex, or any code-generation pipeline) before merge to a protected branch.",
   "type": "module",
+  "license": "MIT",
+  "author": "W33Dplz",
+  "homepage": "https://github.com/W33Dplz/AI-Empire",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/W33Dplz/AI-Empire.git"
+  },
+  "bugs": {
+    "url": "https://github.com/W33Dplz/AI-Empire/issues"
+  },
+  "keywords": [
+    "code-review",
+    "ai",
+    "openai",
+    "supervisor",
+    "lovable",
+    "ci",
+    "github-action",
+    "code-generation",
+    "audit",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "bin": {
+    "ai-empire": "./bin/ai-empire"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "format": "prettier --write \"{src,tests,docs,specs}/**/*.{js,mjs,md,json}\"",
+    "format:check": "prettier --check \"{src,tests,docs,specs}/**/*.{js,mjs,md,json}\"",
+    "demo": "node bin/ai-empire supervise --repo tests/fixtures/demo-pass --branch main --dry-run",
+    "prepare": "node -e \"console.log('ai-empire prepared')\""
+  },
   "dependencies": {
-    "dotenv": "^16.0.0",
-    "openai": "^4.0.0",
-    "simple-git": "^3.30.0"
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "openai": "^4.65.0",
+    "pino": "^9.5.0",
+    "simple-git": "^3.30.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "@vitest/coverage-v8": "^2.1.5",
+    "eslint": "^9.14.0",
+    "globals": "^15.12.0",
+    "prettier": "^3.3.3",
+    "vitest": "^2.1.5"
   }
 }
