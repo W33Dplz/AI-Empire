@@ -42,3 +42,11 @@ Thumbs.db
 
 # Internal archives (not for distribution)
 _internal_archive/
+
+# Claude Code — local agent state (skills/ stays tracked for contributors)
+.claude/settings.local.json
+.claude/agents/_lab/
+.claude/commands/_lab/
+
+# Spec-Kit — local override templates only (shared templates stay tracked)
+.specify/templates/overrides/
