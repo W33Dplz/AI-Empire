@@ -50,3 +50,7 @@ _internal_archive/
 
 # Spec-Kit — local override templates only (shared templates stay tracked)
 .specify/templates/overrides/
+
+# Maintainer's private project-management space (Charles' nomenclature)
+# — kept local so OSS contributors see a clean docs/ tree
+docs/_charles/
