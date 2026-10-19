@@ -4,7 +4,8 @@
     intent,
     baseline,
     scopeDrift,
-    featureRegistry
+    featureRegistry,
+    validationCoverage
 ) {
 
     let overallStatus = "READY";
@@ -27,6 +28,19 @@
 
     if (featureRegistry && featureRegistry.registryBlockingIssues.length > 0) {
         blockingReasons.push(...featureRegistry.registryBlockingIssues);
+    }
+
+    if (validationCoverage) {
+
+        if (validationCoverage.coverageRiskLevel === "CRITICAL") {
+            blockingReasons.push("Validation coverage critical");
+        }
+        else if (validationCoverage.coverageRiskLevel === "HIGH") {
+            warningReasons.push("Validation coverage high risk");
+        }
+        else if (validationCoverage.coverageRiskLevel === "WARNING") {
+            warningReasons.push("Validation coverage partial");
+        }
     }
 
     if (intent.suspiciousPattern) {

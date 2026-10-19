@@ -3,63 +3,48 @@ import { runFeatureTrace } from "./trace/featureTraceEngine.mjs";
 import { buildImpactGraphV2 } from "./trace/impactGraphV2.mjs";
 import { runAudit } from "./audit/auditEngine.mjs";
 import { runTests } from "./test/testEngine.mjs";
-import { runFixEngine } from "./fix/fixEngine.mjs";
 import { runRegressionGuardV2 } from "./regression/regressionGuardV2.mjs";
+import { runFeatureClaimRegistry } from "./registry/featureClaimRegistry.mjs";
 import { runArchitecturalScoreEngine } from "./scoring/architecturalScoreEngine.mjs";
 import { runBaselineEngine } from "./baseline/baselineEngine.mjs";
-import { runIntentClassifier } from "./intent/intentClassifier.mjs";
 import { runCommitIntentExtractor } from "./intent/commitIntentExtractor.mjs";
+import { runIntentClassifier } from "./intent/intentClassifier.mjs";
 import { runScopeDriftDetector } from "./intent/scopeDriftDetector.mjs";
-import { runFeatureClaimRegistry } from "./registry/featureClaimRegistry.mjs";
+import { runValidationCoverageEngine } from "./validation/validationCoverageEngine.mjs";
 import { runDecisionEngine } from "./decision/decisionEngine.mjs";
+import { runFeatureValidationReportEngine } from "./reporting/featureValidationReportEngine.mjs";
 
 export async function runSupervisor(repoPath) {
 
+    // 1. Intake
     const intake = await runIntake(repoPath);
 
-    if (intake.earlyExit) {
-        return {
-            intake,
-            overallStatus: "NO_CHANGE",
-            requiresHumanReview: false
-        };
-    }
-
+    // 2. Trace
     const trace = runFeatureTrace(intake.diffSummary);
-    const architecturalImpact = buildImpactGraphV2(intake.diffSummary);
+
+    // 3. Impact
+    const architecturalImpact = buildImpactGraphV2(trace);
+
+    // 4. Audit
     const audit = await runAudit(repoPath, intake.diffSummary);
 
-    let test = {
-        packageJsonValid: true,
-        packageLockValid: true,
-        testPassed: true
-    };
+    // 5. Test
+    const test = await runTests(repoPath, intake.diffSummary);
 
-    const diffEmpty =
-        intake.diffSummary &&
-        intake.diffSummary.added.length === 0 &&
-        intake.diffSummary.modified.length === 0 &&
-        intake.diffSummary.deleted.length === 0;
-
-    if (!diffEmpty) {
-        test = await runTests(repoPath, intake.diffSummary);
-    }
-
-    const fix = runFixEngine(audit, test);
-
+    // 6. Regression Guard
     const regressionGuard = runRegressionGuardV2(
-        architecturalImpact,
-        intake.diffSummary,
-        audit,
-        test
+        intake,
+        architecturalImpact
     );
 
+    // 7. Feature Registry (repoPath + architecturalImpact requis)
     const featureRegistry = await runFeatureClaimRegistry(
         repoPath,
         intake.diffSummary,
         architecturalImpact
     );
 
+    // 8. Architectural Score
     const architecturalScore = runArchitecturalScoreEngine(
         architecturalImpact,
         regressionGuard,
@@ -68,31 +53,49 @@ export async function runSupervisor(repoPath) {
         featureRegistry
     );
 
+    // 9. Baseline (number only)
     const baseline = await runBaselineEngine(
         architecturalScore.architecturalScore
     );
 
+    // 10. Commit Intent (repoPath only)
+    const commitIntent = await runCommitIntentExtractor(repoPath);
+
+    // 11. Intent Classifier (3 params obligatoires)
     const intent = runIntentClassifier(
         intake.diffSummary,
         architecturalImpact,
         regressionGuard
     );
 
-    const commitIntent = await runCommitIntentExtractor(repoPath);
-
+    // 12. Scope Drift
     const scopeDrift = runScopeDriftDetector(
         commitIntent,
         architecturalImpact,
         regressionGuard
     );
 
+    // 13. Validation Coverage
+    const validationCoverage = await runValidationCoverageEngine(
+        repoPath,
+        intake.diffSummary,
+        featureRegistry
+    );
+
+    // 14. Decision
     const decision = runDecisionEngine(
         architecturalScore,
         regressionGuard,
         intent,
         baseline,
         scopeDrift,
-        featureRegistry
+        featureRegistry,
+        validationCoverage
+    );
+
+    // 15. Feature Validation Report
+    const featureValidationReport = await runFeatureValidationReportEngine(
+        repoPath
     );
 
     return {
@@ -102,13 +105,14 @@ export async function runSupervisor(repoPath) {
         regressionGuard,
         architecturalScore,
         baseline,
-        intent,
         commitIntent,
+        intent,
         scopeDrift,
         featureRegistry,
+        validationCoverage,
         audit,
         test,
-        fix,
-        decision
+        decision,
+        featureValidationReport
     };
 }

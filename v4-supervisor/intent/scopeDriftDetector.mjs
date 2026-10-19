@@ -1,43 +1,78 @@
-﻿export function runScopeDriftDetector(commitIntent, architecturalImpact, regressionGuard) {
+﻿export function runScopeDriftDetector(
+    commitIntent,
+    architecturalImpact,
+    regressionGuard
+) {
 
-    if (!commitIntent || !architecturalImpact || !regressionGuard) {
-        throw new Error("commitIntent, architecturalImpact and regressionGuard required");
+    if (!commitIntent || !architecturalImpact) {
+        throw new Error("commitIntent and architecturalImpact required");
     }
-
-    let driftDetected = false;
-    let driftType = "NONE";
-    let driftSeverity = "LOW";
-    let explanation = "No drift detected";
 
     const declared = commitIntent.declaredIntentType;
     const impactType = architecturalImpact.impactType;
-    const riskLevel = regressionGuard.regressionGuardLevel;
+    const realScope = architecturalImpact.scope;
 
+    let intentClarityLevel = "HIGH";
+    if (declared === "UNKNOWN") intentClarityLevel = "LOW";
+    if (declared === "REFACTOR") intentClarityLevel = "MEDIUM";
+
+    let intentImpactMismatch = "NONE";
+    let scopeMismatchLevel = "NONE";
+
+    // Intent vs impact
     if (declared === "UNKNOWN" && impactType === "STRUCTURAL") {
-        driftDetected = true;
-        driftType = "UNDECLARED_STRUCTURAL_CHANGE";
-        driftSeverity = "HIGH";
-        explanation = "Structural impact detected but commit intent unknown";
+        intentImpactMismatch = "HIGH";
+    }
+    else if (declared === "BUG_FIX" && impactType === "STRUCTURAL") {
+        intentImpactMismatch = "HIGH";
+    }
+    else if (declared === "REFACTOR" && impactType === "STRUCTURAL") {
+        intentImpactMismatch = "MEDIUM";
     }
 
-    if (declared === "BUG_FIX" && impactType === "STRUCTURAL") {
-        driftDetected = true;
-        driftType = "BUGFIX_SCOPE_MISMATCH";
-        driftSeverity = "HIGH";
-        explanation = "Bug fix declared but structural impact observed";
+    // Scope mismatch
+    if (
+        commitIntent.declaredScope === "LOCAL" &&
+        realScope === "GLOBAL"
+    ) {
+        scopeMismatchLevel = "HIGH";
+    }
+    else if (
+        commitIntent.declaredScope === "GLOBAL" &&
+        realScope === "LOCAL"
+    ) {
+        scopeMismatchLevel = "LOW";
     }
 
-    if (declared === "REFACTOR" && riskLevel === "CRITICAL") {
-        driftDetected = true;
-        driftType = "REFACTOR_HIGH_RISK";
-        driftSeverity = "MEDIUM";
-        explanation = "Refactor declared but critical regression risk detected";
+    function score(level) {
+        if (level === "HIGH") return 3;
+        if (level === "MEDIUM") return 2;
+        if (level === "LOW") return 1;
+        return 0;
     }
+
+    const driftScore =
+        score(intentImpactMismatch) +
+        score(scopeMismatchLevel);
+
+    let driftSeverity = "NONE";
+
+    if (driftScore >= 5) driftSeverity = "HIGH";
+    else if (driftScore >= 3) driftSeverity = "MEDIUM";
+    else if (driftScore >= 1) driftSeverity = "LOW";
+
+    let driftConfidenceImpact = "NONE";
+
+    if (driftSeverity === "HIGH") driftConfidenceImpact = "INVALIDATE";
+    else if (driftSeverity === "MEDIUM") driftConfidenceImpact = "REDUCE";
+    else if (driftSeverity === "LOW") driftConfidenceImpact = "MONITOR";
 
     return {
-        driftDetected,
-        driftType,
+        intentClarityLevel,
+        intentImpactMismatch,
+        scopeMismatchLevel,
+        driftScore,
         driftSeverity,
-        explanation
+        driftConfidenceImpact
     };
 }
