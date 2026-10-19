@@ -1,0 +1,10 @@
+[
+  {
+    "featureId": "FT-GLOBAL-LOCAL",
+    "declaredIntent": "FEATURE",
+    "declaredScope": "GLOBAL",
+    "expectedImpactLevel": "STRUCTURAL",
+    "declaredBy": "test",
+    "timestamp": "2026-02-19T09:41:19.241Z"
+  }
+]
